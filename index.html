@@ -489,7 +489,7 @@ function bindProtectedButtons(){
 async function loadDefaultJsonAuto(){
   try{
     const resp=await fetch('./influenza.json?v='+Date.now(),{cache:'no-store'});
-    if(!resp.ok) throw new Error('No se pudo leer influenza.json');
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
     const parsed=await resp.json();
     if(parsed && typeof parsed==='object' && Object.keys(parsed).length){
       datasets=parsed;
@@ -497,7 +497,7 @@ async function loadDefaultJsonAuto(){
       updateDatasetSelect();
       switchDataset('__ALL__');
       const info=document.getElementById('info');
-      if(info) info.innerHTML='<b>Fuente:</b> influenza.json cargado automáticamente · '+info.innerHTML;
+      if(info) info.innerHTML='<b>Fuente:</b> influenza.json · '+info.innerHTML;
       return true;
     }
   }catch(err){ console.error('Error cargando influenza.json:',err); }
@@ -508,4 +508,18 @@ async function startDashboard(){
   loadStore();
   updateDatasetSelect();
   if(!datasetKeys().length){
-    co
+    const ok=await loadDefaultJsonAuto();
+    if(!ok) switchDataset('__ALL__');
+  }else{
+    switchDataset('__ALL__');
+    loadDefaultJsonAuto();
+  }
+  bindProtectedButtons();
+  updateClock();
+  setInterval(updateClock,1000);
+}
+
+startDashboard();
+</script>
+</body>
+</html>
