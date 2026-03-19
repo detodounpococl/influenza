@@ -66,10 +66,13 @@ th{position:sticky;top:0;background:#0f172a;color:#93c5fd}
     <p>Solo campaña influenza · histórico + seguimiento 2026</p>
   </div>
 </div>
-<div style="text-align:right;font-size:12px;color:#cbd5f5">
-  <div id="clock" style="margin-bottom:4px"></div>
-  <div id="epiweek" style="margin-bottom:6px;display:inline-block;padding:8px 12px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;font-weight:700;font-size:14px;box-shadow:0 10px 24px rgba(37,99,235,.28)">Semana epidemiológica actual: -</div>
-  <div style="margin-top:4px">Autor: Rodrigo Villalobos R. · <a href="/cdn-cgi/l/email-protection#47352823352e2028312e2b2b262b28252834767e707f07202a262e2b6924282a" style="color:#93c5fd;text-decoration:none"><span class="__cf_email__" data-cfemail="ddafb2b9afb4bab2abb4b1b1bcb1b2bfb2aeece4eae59dbab0bcb4b1f3beb2b0">[email&#160;protected]</span></a></div>
+<div style="text-align:right;font-size:12px;color:#cbd5f5;max-width:420px">
+  <div id="clock" style="margin-bottom:6px"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center;margin-bottom:8px">
+    <div id="epiweek" style="display:inline-block;padding:8px 12px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;font-weight:700;font-size:14px;box-shadow:0 10px 24px rgba(37,99,235,.28)">Semana epidemiológica actual: -</div>
+    <div id="sourceBadge" style="display:inline-block;padding:8px 12px;border-radius:12px;background:rgba(15,23,42,.85);border:1px solid rgba(147,197,253,.25);color:#93c5fd;font-weight:600">Fuente: esperando carga</div>
+  </div>
+  <div style="margin-top:4px;line-height:1.5">Autor: Rodrigo Villalobos R. · <a href="mailto:rodrigovillalobos1978@gmail.com" style="color:#93c5fd;text-decoration:none">rodrigovillalobos1978@gmail.com</a></div>
 </div>
 </div>
 
@@ -82,7 +85,7 @@ th{position:sticky;top:0;background:#0f172a;color:#93c5fd}
   <input id="jsonfile" type="file" accept=".json" style="display:none" onchange="importStore(this.files)">
   <button id="btnDeleteCurrent" class="danger">Eliminar actual</button>
   <button id="btnClearAll" class="danger">Borrar todo</button>
-  <span style="margin-left:auto;font-size:12px;color:#93c5fd">Acciones sensibles protegidas con clave</span>
+  <span style="margin-left:auto;font-size:12px;color:#93c5fd">Carga, importación y borrado protegidos con clave</span>
 </div>
 
 <div class="wrap">
@@ -90,22 +93,21 @@ th{position:sticky;top:0;background:#0f172a;color:#93c5fd}
     <h2>Cargar archivo de Influenza</h2>
     <p>Formato esperado: hojas <b>HISTORICO</b> y/o <b>ACTUALIZAR</b>.</p>
     <p>Columnas aceptadas: <b>CAMPANIA, ANIO/AÑO, ORIGEN, GRUPO_OBJETIVO, MES, DOSIS_MES</b> y opcionalmente <b>SEMANA</b>.</p>
-    <p>El dashboard intenta cargar automáticamente <b>influenza.json</b> al abrir. También puedes usar las acciones protegidas para cargar o importar datos manualmente.</p>
+    <p>El dashboard intenta cargar automáticamente <b>influenza.json</b> al abrir. Si no aparece información, revisa que el HTML y el JSON estén en la misma carpeta del sitio web.</p>
   </div>
 
   <div id="dash" class="hide">
     <div class="notice" id="info"></div>
 
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px" id="quickYearBtns"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px" id="quickWeekBtns"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <select id="fYear" class="select" onchange="renderAll();updateQuickBtns()"></select>
-      <button class="qbtn" onclick="setYear('Todos')">Todos</button>
-      <select id="fOrigin" class="select" onchange="renderAll()"></select>
-      <select id="fMonth" class="select" onchange="renderAll()"></select>
-      <input id="fGroup" class="input" list="groupList" placeholder="Filtrar grupo objetivo..." oninput="renderAll()">
+      <select id="fOrigin" class="select" onchange="renderAll();updateQuickBtns()"></select>
+      <select id="fMonth" class="select" onchange="renderAll();updateQuickBtns()"></select>
+      <input id="fGroup" class="input" list="groupList" placeholder="Filtrar grupo objetivo..." oninput="renderAll();updateQuickBtns()">
       <datalist id="groupList"></datalist>
-      <select id="fWeek" class="select" onchange="renderAll()"></select>
-      <button class="qbtn" onclick="setWeek('Todas')">Todas</button>
+      <select id="fWeek" class="select" onchange="renderAll();updateQuickBtns()"></select>
       <button class="qbtn" onclick="resetFilters()" style="padding:6px 14px">&#8635; Limpiar</button>
     </div>
 
@@ -121,9 +123,8 @@ th{position:sticky;top:0;background:#0f172a;color:#93c5fd}
         <div id="yearsChart"></div>
       </div>
       <div class="card">
-        <div class="h">Accesos rápidos</div>
-        <div class="small" style="margin-bottom:10px">Se quitó el bloque de “Dosis por mes” para simplificar la lectura.</div>
-        <div id="quickActions" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+        <div class="h" id="monthsTitle">Avance por semana</div>
+        <div id="monthsChart"></div>
       </div>
     </div>
 
@@ -147,7 +148,7 @@ th{position:sticky;top:0;background:#0f172a;color:#93c5fd}
 
 <div class="footer">Versión dedicada a Influenza. Después se puede ampliar con COVID, viruela símica y nirsevimab.</div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const STORE_KEY='influenza_dashboard_store_v1';
 let datasets={}, current='__ALL__';
 
@@ -359,6 +360,8 @@ function renderAll(){
   const dsCount=current==='__ALL__'?datasetKeys().length:1;
   const yearLabel=[...new Set(rows.map(r=>r.anio))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true})).join(', ') || '-';
   qs('info').innerHTML=`<b>Ámbito:</b> ${current==='__ALL__'?'Histórico acumulado':esc(current)} · <b>Archivos visibles:</b> ${dsCount} · <b>Años visibles:</b> ${esc(yearLabel)}`;
+  const sourceBadge=qs('sourceBadge');
+  if(sourceBadge) sourceBadge.textContent='Fuente: '+(current==='__ALL__'?'histórico acumulado':current);
 
   // KPIs — las dos últimas con scroll para no expandir el layout
   const kpiDefs=[
@@ -381,16 +384,25 @@ function renderAll(){
   renderBars('groupsChart', s.groups.slice(0,12).map(x=>({label:x.grupo,value:x.dosis})));
   renderBars('yearsChart', s.years.map(x=>({label:x.anio,value:x.dosis})));
 
-  // Avance mensual: muestra el año seleccionado (o el más reciente si Todos)
+  // Avance por semana: muestra el año seleccionado (o el más reciente si Todos)
   const selYear=qs('fYear').value||'Todos';
   const targetYear=selYear!=='Todos'?selYear:[...new Set(rows.map(r=>r.anio))].sort((a,b)=>b.localeCompare(a,'es',{numeric:true}))[0]||'';
   const monthTitle=qs('monthsTitle');
-  if(monthTitle) monthTitle.textContent='Avance mensual · '+(targetYear||'-');
-  const monthRows=rows.filter(r=>r.anio===targetYear);
-  const monthMap={};
-  monthRows.forEach(r=>{ monthMap[r.mes]=(monthMap[r.mes]||0)+r.dosis; });
-  const monthData=MONTH_ORDER.filter(m=>monthMap[m]!==undefined).map(m=>({label:m.slice(0,3),value:monthMap[m]}));
-  renderCols('monthsChart', monthData);
+  if(monthTitle) monthTitle.textContent='Avance por semana · '+(targetYear||'-');
+  const weekRows=rows.filter(r=>r.anio===targetYear && String(r.semana||'').trim()!=='');
+  const weekMapChart={};
+  weekRows.forEach(r=>{ const wk=String(r.semana).trim(); weekMapChart[wk]=(weekMapChart[wk]||0)+r.dosis; });
+  const weekData=Object.keys(weekMapChart).sort((a,b)=>String(a).localeCompare(String(b),'es',{numeric:true})).map(w=>({label:'S'+w,value:weekMapChart[w]}));
+  if(weekData.length){
+    renderCols('monthsChart', weekData);
+  }else{
+    const monthRows=rows.filter(r=>r.anio===targetYear);
+    const monthMap={};
+    monthRows.forEach(r=>{ monthMap[r.mes]=(monthMap[r.mes]||0)+r.dosis; });
+    const monthData=MONTH_ORDER.filter(m=>monthMap[m]!==undefined).map(m=>({label:m.slice(0,3),value:monthMap[m]}));
+    if(monthTitle) monthTitle.textContent='Avance mensual · '+(targetYear||'-');
+    renderCols('monthsChart', monthData);
+  }
 
   qs('tGroups').innerHTML='<thead><tr><th>#</th><th>Grupo</th><th>Dosis</th><th>%</th></tr></thead><tbody>' +
     s.groups.map((g,i)=>`<tr><td>${i+1}</td><td>${esc(g.grupo)}</td><td>${fmtInt(g.dosis)}</td><td>${s.total?((g.dosis/s.total)*100).toFixed(1):'0.0'}%</td></tr>`).join('') + '</tbody>';
@@ -416,33 +428,26 @@ function updateQuickBtns(){
   const years=[...new Set(rows.map(r=>r.anio).filter(Boolean))].sort((a,b)=>b.localeCompare(a,'es',{numeric:true}));
   const cur=qs('fYear').value||'Todos';
   container.innerHTML=
-    `<span style="font-size:12px;color:#94a3b8;margin-right:4px">Acceso rápido:</span>`+
-    `<button class="qbtn ${cur==='Todos'?'active':''}" onclick="setYear('Todos')">Todos</button>`+
+    `<span style="font-size:12px;color:#94a3b8;margin-right:4px">Años:</span>`+
+    `<button class="qbtn ${cur==='Todos'?'active':''}" onclick="setYear('Todos')">Todos los años</button>`+
     years.map(y=>`<button class="qbtn ${cur===y?'active':''}" onclick="setYear('${y}')">${y}</button>`).join('');
+
+  const weekContainer=qs('quickWeekBtns');
+  if(!weekContainer) return;
+  const yearRows=filteredRows().filter(r=>cur==='Todos' || r.anio===cur);
+  const weeks=[...new Set(yearRows.map(r=>String(r.semana||'').trim()).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'es',{numeric:true})).slice(0,12);
+  const curWeek=qs('fWeek').value||'Todas';
+  weekContainer.innerHTML=
+    `<span style="font-size:12px;color:#94a3b8;margin-right:4px">Semanas:</span>`+
+    `<button class="qbtn ${curWeek==='Todas'?'active':''}" onclick="setWeek('Todas')">Todas las semanas</button>`+
+    weeks.map(w=>`<button class="qbtn ${curWeek===w?'active':''}" onclick="setWeek('${w}')">${w}</button>`).join('');
 }
 function setYear(y){
   qs('fYear').value=y; renderAll(); updateQuickBtns();
 }
-
-function setWeek(v){
-  qs('fWeek').value=v; renderAll();
+function setWeek(w){
+  qs('fWeek').value=w; renderAll(); updateQuickBtns();
 }
-function renderQuickActions(){
-  const el=qs('quickActions');
-  if(!el) return;
-  const actions=[
-    ['Todos los años', ()=>setYear('Todos')],
-    ['Todos los orígenes', ()=>{qs('fOrigin').value='Todos';renderAll();}],
-    ['Todos los meses', ()=>{qs('fMonth').value='Todos';renderAll();}],
-    ['Todas las semanas', ()=>setWeek('Todas')],
-    ['Limpiar filtros', ()=>resetFilters()]
-  ];
-  el.innerHTML=actions.map((a,i)=>`<button class="qbtn" data-action="${i}">${esc(a[0])}</button>`).join('');
-  [...el.querySelectorAll('button[data-action]')].forEach(btn=>{
-    btn.onclick=()=>actions[Number(btn.dataset.action)][1]();
-  });
-}
-
 function renderBars(id,data){
   const el=qs(id);
   if(!data.length){ el.innerHTML='<div class="small">Sin datos</div>'; return; }
@@ -520,7 +525,8 @@ async function loadDefaultJsonAuto(){
       updateDatasetSelect();
       switchDataset('__ALL__');
       const info=document.getElementById('info');
-      if(info) info.innerHTML='<b>Fuente:</b> influenza.json · '+info.innerHTML;
+      if(info) info.innerHTML='<b>Fuente:</b> influenza.json cargado correctamente · '+info.innerHTML;
+      const sourceBadge=document.getElementById('sourceBadge'); if(sourceBadge) sourceBadge.textContent='Fuente: influenza.json';
       return true;
     }
   }catch(err){ console.error('Error cargando influenza.json:',err); }
