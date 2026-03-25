@@ -1,822 +1,652 @@
-<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dashboard Ejecutivo de Campaña · Toma de Decisiones</title>
-<style>
-:root{
-  --bg:#06111f; --bg2:#0b1728; --panel:#0f1d33; --panel2:#13243d; --soft:#1b3353;
-  --line:rgba(255,255,255,.08); --txt:#eaf2ff; --muted:#9db3d3; --cyan:#22d3ee; --blue:#3b82f6;
-  --green:#10b981; --amber:#f59e0b; --red:#ef4444; --violet:#8b5cf6;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg),#081424 60%,#09111d);color:var(--txt);font-family:Segoe UI,Arial,sans-serif}
-.header{
-  padding:18px 22px;border-bottom:1px solid var(--line);
-  background:linear-gradient(135deg,#0a1830,#0c2f52 45%,#10213a);
-  display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center
-}
-.brand{display:flex;gap:14px;align-items:center}
-.logo{
-  width:54px;height:54px;border-radius:16px;display:grid;place-items:center;color:#fff;font-weight:800;
-  background:linear-gradient(135deg,var(--cyan),var(--blue));box-shadow:0 14px 30px rgba(37,99,235,.28)
-}
-h1{margin:0;font-size:24px}
-.sub{margin-top:5px;color:#b9d0f0;font-size:13px}
-.meta{font-size:12px;color:#cfe2ff;text-align:right;line-height:1.5}
-.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:8px}
-.badge{
-  padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.1);
-  background:rgba(15,23,42,.6);color:#c9ddff;font-weight:600
-}
-.badge.primary{background:linear-gradient(135deg,#0891b2,#2563eb);color:#fff;border:none}
-.toolbar{
-  display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 22px;
-  background:#0a1628;border-bottom:1px solid var(--line)
-}
-button,select,input{
-  font:inherit;border-radius:12px;padding:10px 12px;border:1px solid rgba(255,255,255,.12);
-  background:#0d1a2b;color:var(--txt)
-}
-button{cursor:pointer}
-button:hover{filter:brightness(1.06)}
-button.primary{background:linear-gradient(135deg,#0891b2,#2563eb);border:none}
-button.soft{background:#10233c}
-button.warn{background:#3a2411;border-color:#73420c;color:#ffd8a8}
-input,select{min-width:160px}
-.wrap{padding:18px 22px 28px}
-.drop{
-  max-width:900px;margin:38px auto;padding:36px;border-radius:22px;text-align:center;
-  border:2px dashed rgba(96,165,250,.34);background:rgba(59,130,246,.06)
-}
-.drop h2{margin:0 0 12px}
-.drop p{margin:8px 0;color:var(--muted);line-height:1.55}
-.notice{
-  margin-bottom:14px;padding:12px 14px;border-radius:14px;font-size:13px;
-  background:#0d2a38;border:1px solid rgba(34,211,238,.24);color:#d8fbff
-}
-.grid{display:grid;gap:14px}
-.kpis{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:14px}
-.cards-3{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
-.cards-2{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
-.card{
-  background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:20px;padding:16px;
-  box-shadow:0 18px 35px rgba(0,0,0,.18)
-}
-.h{font-size:14px;font-weight:800;margin-bottom:12px;color:#fff;letter-spacing:.2px}
-.muted{color:var(--muted)}
-.kpi .value{font-size:29px;font-weight:800;line-height:1.15;color:#bdf4ff}
-.kpi .label{font-size:12px;color:var(--muted);margin-top:8px}
-.kpi .subv{font-size:12px;color:#cfe2ff;margin-top:8px;line-height:1.45}
-.alert-list{display:grid;gap:10px}
-.alert{
-  border-radius:14px;padding:12px 13px;border:1px solid rgba(255,255,255,.08);background:#0b1627
-}
-.alert.ok{border-left:4px solid var(--green)}
-.alert.warn{border-left:4px solid var(--amber)}
-.alert.risk{border-left:4px solid var(--red)}
-.alert .t{font-weight:800;font-size:13px;margin-bottom:4px}
-.bar{display:flex;align-items:center;gap:10px;margin:10px 0}
-.bar .nm{width:44%;font-size:12px;color:#d7e3f7}
-.bar .track{flex:1;height:10px;background:#091220;border-radius:999px;overflow:hidden}
-.bar .fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:999px}
-.bar .val{width:88px;text-align:right;font-size:12px;color:#9fd8ff}
-.line{display:flex;align-items:flex-end;gap:8px;min-height:250px;padding-top:14px}
-.col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
-.col .b{width:100%;max-width:46px;border-radius:12px 12px 4px 4px;background:linear-gradient(180deg,#22d3ee,#2563eb);min-height:4px}
-.col .x{font-size:11px;color:var(--muted);text-align:center;word-break:break-word}
-.col .y{font-size:11px;color:#dff6ff}
-.table-wrap{overflow:auto;max-height:520px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;white-space:nowrap}
-th{position:sticky;top:0;background:#0c1729;color:#9fd8ff;z-index:1}
-.pill{
-  display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700
-}
-.pill.ok{background:rgba(16,185,129,.15);color:#8ef2cd}
-.pill.warn{background:rgba(245,158,11,.15);color:#ffd08a}
-.pill.risk{background:rgba(239,68,68,.15);color:#ffb0b0}
-.hide{display:none!important}
-.footer{padding:12px 22px 24px;color:#6f86a8;font-size:12px}
-.mini{font-size:11px;color:var(--muted)}
-.rec-box{line-height:1.6;font-size:13px}
-hr.sep{border:none;border-top:1px solid var(--line);margin:12px 0}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Profesional — Rodrigo Villalobos R.</title>
 
-#fCompareYears{min-width:220px;height:98px}
-#fCompareYears option{padding:6px 8px}
-@media (max-width:720px){
-  .meta{text-align:left}
-  .badges{justify-content:flex-start}
-  .toolbar{align-items:stretch}
-  .toolbar > *{width:100%}
-}
-</style>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root{
+      --bg-main:#0f172a;
+      --bg-card:#1e293b;
+      --border:#334155;
+      --accent-cyan:#0ea5e9;
+      --accent-green:#10b981;
+      --accent-amber:#f59e0b;
+      --accent-red:#ef4444;
+      --text:#e6eef8;
+      --muted:#94a3b8;
+      font-family:'Outfit',sans-serif;
+    }
+    [data-theme="light"]{
+      --bg-main:#f8fafc;
+      --bg-card:#ffffff;
+      --border:#e6eef8;
+      --text:#0b1220;
+      --muted:#475569;
+    }
+    html,body{height:100%;margin:0;background:var(--bg-main);color:var(--text);-webkit-font-smoothing:antialiased}
+    .app{max-width:1200px;margin:18px auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .brand h1{font-size:18px;margin:0}
+    .meta{font-size:12px;color:var(--muted)}
+    .header-right{display:flex;align-items:center;gap:10px}
+    .clock{font-weight:600}
+    .btn{background:var(--bg-card);border:1px solid var(--border);padding:8px 10px;border-radius:8px;color:var(--text);cursor:pointer}
+    .btn:hover{box-shadow:0 12px 30px rgba(14,165,233,0.08);border-color:var(--accent-cyan)}
+    nav{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .tab{padding:10px 12px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border);cursor:pointer}
+    .tab.active{box-shadow:0 12px 30px rgba(14,165,233,0.08);border-color:var(--accent-cyan)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+    .kpi{background:var(--bg-card);padding:14px;border-radius:12px;border:1px solid var(--border);transition:all .18s}
+    .kpi:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(14,165,233,0.08);border-color:rgba(14,165,233,0.18)}
+    .kpi .value{font-size:22px;font-weight:700}
+    .kpi .delta{font-size:13px}
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+    .chart-card{background:var(--bg-card);padding:12px;border-radius:12px;border:1px solid var(--border)}
+    .table-card{background:var(--bg-card);padding:12px;border-radius:12px;border:1px solid var(--border);overflow:auto}
+    .hidden{display:none}
+    .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.08);border-top-color:var(--accent-cyan);border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .flex{display:flex;align-items:center;gap:8px}
+    .muted{color:var(--muted)}
+    .search{padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
+    table{width:100%;border-collapse:collapse;color:var(--text)}
+    th,td{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left;font-size:13px}
+    th.sortable{cursor:pointer}
+    .pagination{display:flex;gap:6px;align-items:center;justify-content:center;padding:8px}
+    .page-btn{padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
+    .top5-bar{height:28px;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-green));border-radius:6px}
+    @media print{
+      body{background:#fff;color:#000}
+      .no-print{display:none}
+      .app{max-width:100%;margin:0;padding:0}
+      header,nav,.controls{display:none}
+      .chart-card, .table-card{border:1px solid #ddd}
+    }
+    @media (max-width:1024px){
+      .card-grid{grid-template-columns:repeat(2,1fr)}
+      .charts{grid-template-columns:1fr}
+    }
+    @media (max-width:640px){
+      .card-grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
 <body>
-<div class="header">
-  <div class="brand">
-    <div class="logo">DX</div>
-    <div>
-      <h1>Dashboard Ejecutivo de Campaña</h1>
-      <div class="sub">Orientado a directores de CESFAM, directivos de salud y autoridad sanitaria</div>
+  <div class="app" id="app" data-theme="dark">
+    <header>
+      <div class="brand">
+        <div>
+          <h1>Dashboard Recursos Humanos</h1>
+          <div class="meta">
+            Autor: <strong>Rodrigo Villalobos R.</strong> · Correo: <strong>rodrigovillalobos1978@gmail.com</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right no-print">
+        <div class="meta">
+          <div><span id="clock" class="clock">--:--:--</span></div>
+          <div id="fecha" class="muted">--</div>
+          <div class="muted">Última actualización: <span id="ultima_actualizacion">--</span></div>
+        </div>
+
+        <button class="btn" id="themeToggle" title="Toggle tema">🌗</button>
+      </div>
+    </header>
+
+    <!-- Global buttons -->
+    <div class="no-print">
+      <div class="flex" style="justify-content:space-between">
+        <nav id="tabs" aria-label="Pestañas">
+          <div class="tab active" data-tab="resumen">📊 Resumen General</div>
+          <div class="tab" data-tab="periodo">📅 Análisis por Período</div>
+          <div class="tab" data-tab="comparativa">📈 Comparativa Multi-Período</div>
+          <div class="tab" data-tab="top5">🏆 Top 5 Diagnósticos</div>
+          <div class="tab" data-tab="datos">🗃️ Datos Completos</div>
+        </nav>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn" id="exportExcel">📤 Exportar Excel</button>
+          <button class="btn" id="printTab">🖨️ Imprimir Pestaña</button>
+          <button class="btn" id="importJsonBtn">📥 Importar JSON</button>
+          <button class="btn" id="refreshBtn">🔄 Actualizar</button>
+          <button class="btn" id="aboutBtn">ℹ️ Acerca de</button>
+        </div>
+      </div>
     </div>
+
+    <hr style="border:none;height:12px">
+
+    <!-- Filters -->
+    <div class="controls no-print">
+      <label class="muted">Año:
+        <select id="filterYear" class="btn">
+          <option value="all">Todos</option>
+        </select>
+      </label>
+
+      <label class="muted">Mes:
+        <select id="filterMonth" class="btn">
+          <option value="all">Todos</option>
+        </select>
+      </label>
+
+      <label id="turnoFilterLabel" class="muted hidden">Turno:
+        <select id="filterTurno" class="btn">
+          <option value="all">Todos</option>
+        </select>
+      </label>
+
+      <label class="muted">Buscar:
+        <input id="globalSearch" class="search" placeholder="Buscar en todas las columnas">
+      </label>
+
+      <div style="margin-left:auto" id="loadingIndicator" class="flex hidden">
+        <div class="spinner"></div><div class="muted">Cargando...</div>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <main>
+      <!-- Resumen -->
+      <section id="resumen" class="tab-content">
+        <div class="card-grid" id="kpiGrid">
+          <!-- KPI cards injected here -->
+        </div>
+
+        <div class="charts">
+          <div class="chart-card">
+            <h3 style="margin:0 0 8px 0">Distribución mensual — Año seleccionado</h3>
+            <canvas id="barMonthly" height="160"></canvas>
+          </div>
+
+          <div class="chart-card">
+            <h3 style="margin:0 0 8px 0">Distribución por categoría</h3>
+            <canvas id="donutCategory" height="160"></canvas>
+          </div>
+
+          <div class="chart-card" style="grid-column:1/3;margin-top:12px">
+            <h3 style="margin:0 0 8px 0">Tendencia indicador principal</h3>
+            <canvas id="lineTrend" height="120"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Análisis por Período -->
+      <section id="periodo" class="tab-content hidden">
+        <div class="chart-card">
+          <h3>KPIs del período</h3>
+          <div id="periodoKPIs" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px"></div>
+        </div>
+
+        <div class="table-card" style="margin-top:12px">
+          <h3>Tabla detallada</h3>
+          <div style="overflow:auto">
+            <table id="tablePeriodo">
+              <thead id="theadPeriodo"></thead>
+              <tbody id="tbodyPeriodo"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comparativa -->
+      <section id="comparativa" class="tab-content hidden">
+        <div class="chart-card">
+          <h3>Comparativa Multi-Período</h3>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+            <label class="muted">Tipo:
+              <select id="comparativaTipo" class="btn">
+                <option value="años">Años</option>
+                <option value="meses">Meses</option>
+              </select>
+            </label>
+
+            <label class="muted">Seleccionar (2–5):
+              <select id="comparativaSelector" class="btn" multiple size="3" style="min-width:220px"></select>
+            </label>
+          </div>
+
+          <canvas id="comparativaChart" height="160"></canvas>
+        </div>
+
+        <div class="table-card" style="margin-top:12px">
+          <h3>Tabla comparativa</h3>
+          <div id="comparativaTableWrap"></div>
+        </div>
+      </section>
+
+      <!-- Top 5 -->
+      <section id="top5" class="tab-content hidden">
+        <div class="chart-card">
+          <h3>Top 5 Diagnósticos / Actividades</h3>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+            <label class="muted">Período:
+              <select id="top5Periodo" class="btn">
+                <option value="all">Todos</option>
+              </select>
+            </label>
+            <button class="btn" id="top5CompareBtn">Comparar vs período anterior</button>
+          </div>
+
+          <div id="top5Content"></div>
+        </div>
+      </section>
+
+      <!-- Datos completos -->
+      <section id="datos" class="tab-content hidden">
+        <div class="table-card">
+          <h3>Datos completos</h3>
+          <div style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+            <div class="muted">Total registros: <span id="totalRegistros">0</span></div>
+            <div>
+              <label class="muted">Mostrar:
+                <select id="pageSize" class="btn">
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div style="overflow:auto">
+            <table id="tableAll">
+              <thead id="theadAll"></thead>
+              <tbody id="tbodyAll"></tbody>
+            </table>
+          </div>
+
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="importModal" class="no-print hidden" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center">
+      <div style="background:var(--bg-card);border:1px solid var(--border);padding:18px;border-radius:12px;width:420px;box-shadow:var(--shadow)">
+        <h3>Importar JSON (modo local)</h3>
+        <p class="muted">Ingrese la clave y seleccione el archivo .json</p>
+        <input id="importPassword" type="password" placeholder="Clave" class="search" style="width:100%;margin-bottom:8px">
+        <input id="importFile" type="file" accept=".json" style="width:100%;margin-bottom:8px">
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn" id="importCancel">Cancelar</button>
+          <button class="btn" id="importConfirm">Cargar</button>
+        </div>
+        <div id="importMsg" class="muted" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div id="aboutModal" class="no-print hidden" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center">
+      <div style="background:var(--bg-card);border:1px solid var(--border);padding:18px;border-radius:12px;width:520px;box-shadow:var(--shadow)">
+        <h3>Sistema de Dashboard</h3>
+        <p><strong>Nombre:</strong> Dashboard Recursos Humanos</p>
+        <p><strong>Versión:</strong> 1.0</p>
+        <p><strong>Autor:</strong> Rodrigo Villalobos R. — rodrigovillalobos1978@gmail.com</p>
+        <p><strong>Última actualización JSON:</strong> <span id="aboutUltima">--</span></p>
+        <p><strong>Total registros:</strong> <span id="aboutTotal">--</span></p>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn" id="aboutClose">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <div class="meta">
-    <div class="badges">
-      <div class="badge primary" id="badgeWeek">Semana epidemiológica: -</div>
-      <div class="badge" id="badgeSource">Fuente: sin datos</div>
-      <div class="badge" id="badgeUpdated">Actualizado: -</div>
-    </div>
-    <div>Autor: Rodrigo Villalobos R. · <a href="mailto:rodrigovillalobos1978@gmail.com" style="color:#9fd8ff;text-decoration:none">rodrigovillalobos1978@gmail.com</a></div>
-  </div>
-</div>
 
-<div class="toolbar">
-  <button id="btnLoadJson" class="primary">Actualizar JSON (con clave)</button>
-  <input id="jsonfile" type="file" accept=".json" style="display:none">
-  <button class="soft" onclick="downloadCurrentJson()">Exportar JSON actual</button>
-  <button class="soft" onclick="tryLoadDefaultJson()">Recargar influenza.json</button>
-  <button class="warn" onclick="resetFilters()">Limpiar filtros</button>
+  <script>
+    /***********************
+     * Configuración inicial
+     ***********************/
+    const JSON_URL = 'https://[USUARIO].github.io/[REPO]/datos.json'; // editar al desplegar
+    const IMPORT_KEY = 'Zoe2023@';
+    let DATA = null;
+    let filtered = [];
+    let currentTab = 'resumen';
+    let charts = {};
+    let state = {
+      year:'all', month:'all', turno:'all', search:'', page:1, pageSize:20
+    };
 
-  <select id="fYear" onchange="renderAll()"></select>
-  <select id="fOrigin" onchange="renderAll()"></select>
-  <select id="fMonth" onchange="renderAll()"></select>
-  <select id="fWeek" onchange="renderAll()"></select>
-  <input id="fGroup" list="groupList" placeholder="Buscar grupo objetivo..." oninput="renderAll()">
-  <select id="fCompareMode" onchange="handleCompareModeChange()">
-    <option value="last2">Comparar últimos 2 años</option>
-    <option value="last3">Comparar últimos 3 años</option>
-    <option value="manual">Comparar años seleccionados</option>
-  </select>
-  <select id="fCompareYears" multiple size="3" class="hide" onchange="handleCompareYearsChange()" title="Seleccione 2 o 3 años"></select>
-  <datalist id="groupList"></datalist>
-</div>
+    /***********************
+     * Utilidades
+     ***********************/
+    function $(id){return document.getElementById(id)}
+    function formatDateISO(d){ return new Date(d).toISOString().slice(0,19) }
+    function safeNum(v){return isNaN(Number(v))?0:Number(v)}
+    function show(id){$(id).classList.remove('hidden')}
+    function hide(id){$(id).classList.add('hidden')}
 
-<div class="wrap">
-  <div id="nodata" class="drop">
-    <h2>Dashboard listo para actualización por JSON</h2>
-    <p>Este tablero prioriza indicadores útiles para decisión directiva: volumen total, concentración por grupo, comportamiento semanal, comparación interanual, alertas operativas y focos de gestión.</p>
-    <p>Puede cargar automáticamente un archivo <b>influenza.json</b> si está en la misma carpeta del HTML, o actualizar manualmente mediante el botón <b>“Actualizar datos desde JSON”</b>.</p>
-    <p>Formato esperado: objeto JSON con datasets y filas que contengan campos equivalentes a <b>anio, origen, grupo, mes, semana, dosis</b>. También acepta un arreglo plano de registros.</p>
-  </div>
+    /***********************
+     * Reloj y fecha
+     ***********************/
+    function startClock(){
+      const clock = $('clock'), fecha = $('fecha');
+      function tick(){
+        const now = new Date();
+        clock.textContent = now.toLocaleTimeString();
+        fecha.textContent = now.toLocaleDateString();
+      }
+      tick();
+      setInterval(tick,1000);
+    }
 
-  <div id="dash" class="hide">
-    <div id="info" class="notice"></div>
-
-    <div class="grid kpis" id="kpis"></div>
-
-    <div class="grid cards-3">
-      <div class="card">
-        <div class="h">Semáforo ejecutivo</div>
-        <div id="alerts" class="alert-list"></div>
-      </div>
-      <div class="card">
-        <div class="h">Grupos con mayor carga</div>
-        <div id="groupsChart"></div>
-      </div>
-      <div class="card">
-        <div class="h" id="evolutionTitle">Evolución del período</div>
-        <div id="evolutionChart"></div>
-      </div>
-    </div>
-
-    <div class="grid cards-2" style="margin-top:14px">
-      <div class="card">
-        <div class="h" id="compareTitle">Comparación por año</div>
-        <div id="yearsChart"></div>
-        <div class="mini" id="compareHelp">Permite detectar crecimiento, contracción o desplazamiento temporal de la campaña.</div>
-      </div>
-      <div class="card">
-        <div class="h">Recomendaciones para decisión</div>
-        <div id="recommendations" class="rec-box"></div>
-      </div>
-    </div>
-
-    <div class="grid cards-2" style="margin-top:14px">
-      <div class="card">
-        <div class="h">Resumen por grupo objetivo</div>
-        <div class="table-wrap"><table id="tGroups"></table></div>
-      </div>
-      <div class="card">
-        <div class="h">Resumen por origen</div>
-        <div class="table-wrap"><table id="tOrigins"></table></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:14px">
-      <div class="h">Detalle operativo</div>
-      <div class="table-wrap"><table id="tDetail"></table></div>
-    </div>
-  </div>
-</div>
-
-<div class="footer">Versión ejecutiva enfocada en toma de decisiones. Preparada para GitHub Pages y actualización mediante JSON.</div>
-
-<script>
-const STORE_KEY='dashboard_decision_json_v3';
-const UPDATE_PASSWORD='Zoe2023@';
-const MONTH_ORDER=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
-let rowsMaster=[];
-
-const qs=id=>document.getElementById(id);
-function safe(v){ return v===null||v===undefined?'':String(v).trim(); }
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function toNum(v){
-  if(v===null||v===undefined||v==='') return 0;
-  if(typeof v==='number') return isFinite(v)?v:0;
-  let s=String(v).replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');
-  let n=parseFloat(s); return isFinite(n)?n:0;
-}
-function fmtInt(n){ return new Intl.NumberFormat('es-CL').format(Math.round(n||0)); }
-function normMonth(v){
-  let m=safe(v).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  return MONTH_ORDER.includes(m)?m:m;
-}
-function sortNumericText(a,b){ return String(a).localeCompare(String(b),'es',{numeric:true,sensitivity:'base'}); }
-
-function saveRows(){ localStorage.setItem(STORE_KEY, JSON.stringify(rowsMaster)); }
-function loadRows(){
-  try{
-    const raw=localStorage.getItem(STORE_KEY);
-    rowsMaster=raw?JSON.parse(raw):[];
-    if(!Array.isArray(rowsMaster)) rowsMaster=[];
-  }catch(e){ rowsMaster=[]; }
-}
-
-function normalizeRecord(r){
-  const anio=safe(r.anio||r.ANIO||r.AÑO||r.ano||r.ANO||r.year);
-  const origen=safe(r.origen||r.ORIGEN||'CONSOLIDADO').toUpperCase() || 'CONSOLIDADO';
-  const grupo=safe(r.grupo||r.GRUPO||r.grupo_objetivo||r.GRUPO_OBJETIVO||r['grupo objetivo']);
-  const mes=normMonth(r.mes||r.MES);
-  const semana=safe(r.semana||r.SEMANA);
-  const dosis=toNum(r.dosis||r.DOSIS||r.dosis_mes||r.DOSIS_MES||r.total);
-  if(!anio || !grupo || !mes) return null;
-  return {anio:String(anio), origen, grupo, mes, semana, dosis};
-}
-
-function extractRowsFromJson(parsed){
-  let rows=[];
-  if(Array.isArray(parsed)){
-    rows = parsed.map(normalizeRecord).filter(Boolean);
-  } else if(parsed && typeof parsed==='object'){
-    if(Array.isArray(parsed.rows)){
-      rows = parsed.rows.map(normalizeRecord).filter(Boolean);
-    } else {
-      Object.entries(parsed).forEach(([key,val])=>{
-        if(Array.isArray(val?.rows)){
-          val.rows.forEach(r=>{
-            const nr=normalizeRecord(r);
-            if(nr){ nr.dataset=key; rows.push(nr); }
-          });
-        } else if(Array.isArray(val)){
-          val.forEach(r=>{
-            const nr=normalizeRecord(r);
-            if(nr){ nr.dataset=key; rows.push(nr); }
-          });
+    /***********************
+     * Carga de datos
+     ***********************/
+    async function loadRemoteJSON(){
+      $('loadingIndicator').classList.remove('hidden');
+      try{
+        const res = await fetch(JSON_URL + '?_=' + Date.now());
+        if(!res.ok) throw new Error('fetch error');
+        const j = await res.json();
+        DATA = j;
+        postLoad();
+      }catch(e){
+        console.warn('Fetch falló, usando fallback si existe',e);
+        if(!DATA) {
+          // fallback: usar datos.json embebido si existe en la misma carpeta
+          try{
+            const res2 = await fetch('datos.json?_=' + Date.now());
+            if(res2.ok){ DATA = await res2.json(); postLoad(); }
+            else { console.error('No hay datos disponibles'); }
+          }catch(err){ console.error(err); }
         }
+      }finally{
+        $('loadingIndicator').classList.add('hidden');
+      }
+    }
+
+    function postLoad(){
+      // meta
+      $('ultima_actualizacion').textContent = DATA.meta.ultima_actualizacion || '--';
+      $('aboutUltima').textContent = DATA.meta.ultima_actualizacion || '--';
+      $('aboutTotal').textContent = DATA.meta.total_registros || (DATA.registros?DATA.registros.length:'--');
+      $('totalRegistros').textContent = DATA.meta.total_registros || (DATA.registros?DATA.registros.length:'0');
+
+      // build filters
+      buildFilters();
+      applyFiltersFromStorage();
+      applyFilters();
+    }
+
+    /***********************
+     * Filtros y persistencia
+     ***********************/
+    function buildFilters(){
+      const years = new Set(), months = new Map(), turnos = new Set();
+      DATA.registros.forEach(r=>{
+        years.add(r.año);
+        months.set(r.mes_num + '|' + r.mes, r.mes);
+        if(r.turno) turnos.add(r.turno);
+      });
+      const fy = $('filterYear'); fy.innerHTML = '<option value="all">Todos</option>';
+      Array.from(years).sort().forEach(y=>{
+        const o = document.createElement('option'); o.value=y; o.textContent=y; fy.appendChild(o);
+      });
+      const fm = $('filterMonth'); fm.innerHTML = '<option value="all">Todos</option>';
+      Array.from(months).sort((a,b)=>Number(a.split('|')[0])-Number(b.split('|')[0])).forEach(k=>{
+        const [num,mes] = k.split('|');
+        const o = document.createElement('option'); o.value=num; o.textContent=mes; fm.appendChild(o);
+      });
+
+      if(turnos.size>0){
+        $('turnoFilterLabel').classList.remove('hidden');
+        const ft = $('filterTurno'); ft.innerHTML = '<option value="all">Todos</option>';
+        Array.from(turnos).forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; ft.appendChild(o); });
+      } else {
+        $('turnoFilterLabel').classList.add('hidden');
+      }
+
+      // top5 periodos
+      const top5Periodo = $('top5Periodo'); top5Periodo.innerHTML = '<option value="all">Todos</option>';
+      const periodSet = new Set();
+      DATA.registros.forEach(r=> periodSet.add(`${r.año}-${String(r.mes_num).padStart(2,'0')}`));
+      Array.from(periodSet).sort().reverse().forEach(p=>{
+        const [a,m]=p.split('-'); const mesName = DATA.registros.find(rr=>rr.año==a && String(rr.mes_num).padStart(2,'0')==m).mes;
+        const o=document.createElement('option'); o.value=p; o.textContent=`${mesName} ${a}`; top5Periodo.appendChild(o);
+      });
+
+      // comparativa selector (años)
+      const compSel = $('comparativaSelector'); compSel.innerHTML='';
+      Array.from(years).sort().forEach(y=>{
+        const o=document.createElement('option'); o.value=y; o.textContent=y; compSel.appendChild(o);
       });
     }
-  }
-  return rows;
-}
 
-function fillSelect(sel, values, fallback){
-  const cur=sel.value || fallback;
-  sel.innerHTML=values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
-  sel.value=values.includes(cur)?cur:fallback;
-}
-
-function allYearsSorted(){
-  return [...new Set(rowsMaster.map(r=>r.anio).filter(Boolean))].sort(sortNumericText);
-}
-
-function populateComparisonYearOptions(){
-  const sel=qs('fCompareYears');
-  const existing=[...sel.options].filter(o=>o.selected).map(o=>o.value);
-  const years=allYearsSorted();
-  sel.innerHTML=years.map(y=>`<option value="${esc(y)}">${esc(y)}</option>`).join('');
-  if(existing.length){
-    [...sel.options].forEach(o=>{ if(existing.includes(o.value)) o.selected=true; });
-  }
-  const selected=[...sel.options].filter(o=>o.selected);
-  if(!selected.length && years.length){
-    const defaults=years.slice(-2);
-    [...sel.options].forEach(o=>{ if(defaults.includes(o.value)) o.selected=true; });
-  }
-}
-
-function populateFilters(){
-  const years=['Todos', ...allYearsSorted()];
-  const origins=['Todos', ...[...new Set(rowsMaster.map(r=>r.origen).filter(Boolean))].sort(sortNumericText)];
-  const months=['Todos', ...MONTH_ORDER.filter(m=>rowsMaster.some(r=>r.mes===m))];
-  const weeks=['Todas', ...[...new Set(rowsMaster.map(r=>r.semana).filter(Boolean))].sort(sortNumericText)];
-  fillSelect(qs('fYear'), years, 'Todos');
-  fillSelect(qs('fOrigin'), origins, 'Todos');
-  fillSelect(qs('fMonth'), months, 'Todos');
-  fillSelect(qs('fWeek'), weeks, 'Todas');
-  qs('groupList').innerHTML=[...new Set(rowsMaster.map(r=>r.grupo).filter(Boolean))].sort(sortNumericText).map(v=>`<option value="${esc(v)}"></option>`).join('');
-  populateComparisonYearOptions();
-  updateCompareControls();
-}
-
-function getFilterState(){
-  return {
-    y: qs('fYear').value||'Todos',
-    o: qs('fOrigin').value||'Todos',
-    m: qs('fMonth').value||'Todos',
-    w: qs('fWeek').value||'Todas',
-    g: (qs('fGroup').value||'').trim().toLowerCase()
-  };
-}
-
-function rowsByFilters(ignoreYear=false){
-  const f=getFilterState();
-  return rowsMaster.filter(r =>
-    (ignoreYear || f.y==='Todos' || r.anio===f.y) &&
-    (f.o==='Todos' || r.origen===f.o) &&
-    (f.m==='Todos' || r.mes===f.m) &&
-    (f.w==='Todas' || safe(r.semana)===f.w) &&
-    (!f.g || r.grupo.toLowerCase().includes(f.g))
-  );
-}
-
-function filteredRows(){ return rowsByFilters(false); }
-function baseRowsForComparison(){ return rowsByFilters(true); }
-
-function summarize(rows){
-  const total=rows.reduce((a,b)=>a+(b.dosis||0),0);
-  const byGroup={}, byYear={}, byOrigin={}, byMonth={}, byWeek={}, byYearMonth={}, byYearWeek={};
-  rows.forEach(r=>{
-    byGroup[r.grupo]=(byGroup[r.grupo]||0)+r.dosis;
-    byYear[r.anio]=(byYear[r.anio]||0)+r.dosis;
-    byOrigin[r.origen]=(byOrigin[r.origen]||0)+r.dosis;
-    byMonth[r.mes]=(byMonth[r.mes]||0)+r.dosis;
-    const wk=safe(r.semana)||'Sin semana';
-    byWeek[wk]=(byWeek[wk]||0)+r.dosis;
-
-    byYearMonth[r.anio]=byYearMonth[r.anio]||{};
-    byYearMonth[r.anio][r.mes]=(byYearMonth[r.anio][r.mes]||0)+r.dosis;
-
-    byYearWeek[r.anio]=byYearWeek[r.anio]||{};
-    byYearWeek[r.anio][wk]=(byYearWeek[r.anio][wk]||0)+r.dosis;
-  });
-
-  const groups=Object.entries(byGroup).map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value);
-  const years=Object.entries(byYear).map(([label,value])=>({label,value})).sort((a,b)=>sortNumericText(a.label,b.label));
-  const origins=Object.entries(byOrigin).map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value);
-  const months=MONTH_ORDER.filter(m=>byMonth[m]!==undefined).map(m=>({label:m,value:byMonth[m]}));
-  const weeks=Object.entries(byWeek).map(([label,value])=>({label,value})).sort((a,b)=>sortNumericText(a.label,b.label));
-
-  let topGroup=groups[0]||null;
-  let topOrigin=origins[0]||null;
-  let concentrationTop3=groups.slice(0,3).reduce((a,b)=>a+b.value,0);
-  let concentrationPct=total? concentrationTop3*100/total : 0;
-
-  let yoy=null;
-  if(years.length>=2){
-    const prev=years[years.length-2].value;
-    const cur=years[years.length-1].value;
-    yoy=prev? ((cur-prev)*100/prev) : null;
-  }
-
-  const latestYear=years.length?years[years.length-1].label:'';
-  const latestWeekEntries=latestYear && byYearWeek[latestYear] ? Object.entries(byYearWeek[latestYear]).filter(([k])=>k!=='Sin semana').sort((a,b)=>sortNumericText(a[0],b[0])) : [];
-  let weeklyMomentum=null;
-  if(latestWeekEntries.length>=2){
-    const prev=latestWeekEntries[latestWeekEntries.length-2][1];
-    const cur=latestWeekEntries[latestWeekEntries.length-1][1];
-    weeklyMomentum=prev? ((cur-prev)*100/prev) : null;
-  }
-
-  const latestMonthEntries=latestYear && byYearMonth[latestYear]
-    ? Object.entries(byYearMonth[latestYear]).sort((a,b)=>MONTH_ORDER.indexOf(a[0])-MONTH_ORDER.indexOf(b[0]))
-    : [];
-  let peakMonth='-';
-  if(latestMonthEntries.length){
-    latestMonthEntries.sort((a,b)=>b[1]-a[1] || MONTH_ORDER.indexOf(a[0])-MONTH_ORDER.indexOf(b[0]));
-    peakMonth=latestMonthEntries[0][0];
-  }
-
-  return {total,groups,years,origins,months,weeks,topGroup,topOrigin,concentrationPct,yoy,weeklyMomentum,peakMonth,latestYear,registros:rows.length};
-}
-
-function getComparisonYears(baseRows){
-  const mode=qs('fCompareMode').value || 'last2';
-  const available=[...new Set(baseRows.map(r=>r.anio).filter(Boolean))].sort(sortNumericText);
-  if(!available.length) return [];
-  if(mode==='manual'){
-    const selected=[...qs('fCompareYears').selectedOptions].map(o=>o.value).filter(y=>available.includes(y)).sort(sortNumericText);
-    return selected.length ? selected.slice(0,3) : available.slice(-2);
-  }
-  return available.slice(mode==='last3' ? -3 : -2);
-}
-
-function summarizeComparison(baseRows){
-  const years=getComparisonYears(baseRows);
-  const data=years.map(y=>({
-    label:y,
-    value:baseRows.filter(r=>r.anio===y).reduce((acc,r)=>acc+r.dosis,0)
-  }));
-  let latestVsPrev=null, spanPct=null;
-  if(data.length>=2){
-    const prev=data[data.length-2].value;
-    const cur=data[data.length-1].value;
-    latestVsPrev=prev ? ((cur-prev)*100/prev) : null;
-  }
-  if(data.length>=3){
-    const first=data[0].value;
-    const last=data[data.length-1].value;
-    spanPct=first ? ((last-first)*100/first) : null;
-  }
-  return {
-    years,
-    data,
-    latestVsPrev,
-    spanPct,
-    mode:qs('fCompareMode').value || 'last2',
-    text:years.length ? years.join(' vs ') : 'Sin comparación'
-  };
-}
-
-function statusPill(pct){
-  if(pct>=50) return '<span class="pill risk">Alta concentración</span>';
-  if(pct>=35) return '<span class="pill warn">Concentración media</span>';
-  return '<span class="pill ok">Distribución razonable</span>';
-}
-
-function buildAlerts(s, rows, comp){
-  const alerts=[];
-  if(!rows.length){
-    alerts.push({cls:'risk', t:'Sin datos visibles', d:'No hay registros para los filtros aplicados.'});
-    return alerts;
-  }
-
-  alerts.push({
-    cls: s.concentrationPct>=50 ? 'risk' : s.concentrationPct>=35 ? 'warn' : 'ok',
-    t: 'Concentración por grupos',
-    d: `Los 3 grupos principales concentran ${s.concentrationPct.toFixed(1)}% de las dosis visibles. ${s.concentrationPct>=50?'Conviene reforzar estrategia focalizada.':'La distribución es más equilibrada.'}`
-  });
-
-  if(comp.data.length>=2 && comp.latestVsPrev!==null){
-    alerts.push({
-      cls: comp.latestVsPrev<0 ? 'warn' : 'ok',
-      t: 'Comparación interanual',
-      d: `${comp.latestVsPrev>=0?'Aumento':'Disminución'} de ${Math.abs(comp.latestVsPrev).toFixed(1)}% entre ${comp.years[comp.years.length-2]} y ${comp.years[comp.years.length-1]}.`
-    });
-  }
-
-  if(comp.data.length>=3 && comp.spanPct!==null){
-    alerts.push({
-      cls: comp.spanPct<0 ? 'warn' : 'ok',
-      t: 'Tendencia acumulada',
-      d: `${comp.spanPct>=0?'Crecimiento':'Caída'} de ${Math.abs(comp.spanPct).toFixed(1)}% entre ${comp.years[0]} y ${comp.years[comp.years.length-1]}.`
-    });
-  } else if(s.weeklyMomentum!==null){
-    alerts.push({
-      cls: s.weeklyMomentum<0 ? 'warn' : 'ok',
-      t: 'Impulso semanal reciente',
-      d: `${s.weeklyMomentum>=0?'Crecimiento':'Caída'} de ${Math.abs(s.weeklyMomentum).toFixed(1)}% en la última semana registrada del año ${s.latestYear}.`
-    });
-  } else {
-    alerts.push({
-      cls:'warn',
-      t:'Seguimiento semanal insuficiente',
-      d:'No hay semanas suficientes para evaluar aceleración o desaceleración reciente.'
-    });
-  }
-
-  if(s.topOrigin){
-    alerts.push({
-      cls:'ok',
-      t:'Origen predominante',
-      d:`${s.topOrigin.label} aporta ${((s.topOrigin.value/(s.total||1))*100).toFixed(1)}% del total visible.`
-    });
-  }
-  return alerts.slice(0,4);
-}
-
-function buildRecommendations(s, comp){
-  const rec=[];
-  if(!s.total){
-    rec.push('No es posible emitir recomendaciones porque no hay datos visibles.');
-    return rec;
-  }
-  if(s.concentrationPct>=50){
-    rec.push(`Priorizar microplanificación en ${esc(s.groups[0]?.label||'grupo principal')} y siguientes grupos de mayor carga, porque concentran la mayor parte de las dosis.`);
-  } else {
-    rec.push('Mantener estrategia diversificada, porque la carga está más repartida entre grupos.');
-  }
-
-  if(comp.data.length>=2 && comp.latestVsPrev!==null){
-    if(comp.latestVsPrev<0){
-      rec.push(`Revisar brecha interanual entre ${comp.years[comp.years.length-2]} y ${comp.years[comp.years.length-1]} para ajustar oferta, captación y puntos móviles.`);
-    } else {
-      rec.push(`Conservar las acciones que sostienen la mejora entre ${comp.years[comp.years.length-2]} y ${comp.years[comp.years.length-1]} y replicarlas en territorios rezagados.`);
+    function saveFiltersToStorage(){
+      localStorage.setItem('dashboard_filters', JSON.stringify(state));
     }
-  }
-
-  if(comp.data.length>=3 && comp.spanPct!==null){
-    rec.push(`Use la comparación de ${comp.text} para validar tendencia estructural y no solo variaciones aisladas de una temporada.`);
-  } else if(s.weeklyMomentum!==null){
-    if(s.weeklyMomentum<0){
-      rec.push('Reforzar operativos, llamados activos y extensión horaria si se busca recuperar ritmo semanal.');
-    } else {
-      rec.push('Sostener la táctica actual en la última fase observada, ya que el ritmo semanal muestra expansión.');
+    function applyFiltersFromStorage(){
+      const s = localStorage.getItem('dashboard_filters');
+      if(s){ try{ const st = JSON.parse(s); Object.assign(state,st); }catch(e){} }
+      // apply to UI
+      $('filterYear').value = state.year || 'all';
+      $('filterMonth').value = state.month || 'all';
+      if($('filterTurno')) $('filterTurno').value = state.turno || 'all';
+      $('globalSearch').value = state.search || '';
+      $('pageSize').value = state.pageSize || 20;
     }
-  } else {
-    rec.push('Mejorar registro de semana para habilitar monitoreo táctico fino y evaluación de oportunidad.');
-  }
 
-  rec.push(`Mes pico del último año visible: ${esc(s.peakMonth)}. Úselo como referencia para programación de recurso humano, stock e insumos.`);
-  return rec;
-}
+    /***********************
+     * Filtrado y búsqueda
+     ***********************/
+    function applyFilters(){
+      const year = $('filterYear').value;
+      const month = $('filterMonth').value;
+      const turno = $('filterTurno')?$('filterTurno').value:'all';
+      const search = $('globalSearch').value.trim().toLowerCase();
 
-function renderBars(id,data,suffix=''){
-  const el=qs(id);
-  if(!data.length){ el.innerHTML='<div class="muted">Sin datos</div>'; return; }
-  const max=Math.max(...data.map(d=>d.value),1);
-  el.innerHTML=data.map(d=>`
-    <div class="bar">
-      <div class="nm">${esc(d.label)}</div>
-      <div class="track"><div class="fill" style="width:${(d.value/max*100).toFixed(1)}%"></div></div>
-      <div class="val">${fmtInt(d.value)}${suffix}</div>
-    </div>`).join('');
-}
+      state.year = year; state.month = month; state.turno = turno; state.search = search;
+      saveFiltersToStorage();
 
-function renderCols(id,data){
-  const el=qs(id);
-  if(!data.length){ el.innerHTML='<div class="muted">Sin datos</div>'; return; }
-  const max=Math.max(...data.map(d=>d.value),1);
-  el.innerHTML='<div class="line">' + data.map(d=>`
-    <div class="col">
-      <div class="y">${fmtInt(d.value)}</div>
-      <div class="b" style="height:${Math.max(6,(d.value/max)*180)}px"></div>
-      <div class="x">${esc(d.label)}</div>
-    </div>`).join('') + '</div>';
-}
+      filtered = DATA.registros.filter(r=>{
+        if(year!=='all' && String(r.año)!==String(year)) return false;
+        if(month!=='all' && String(r.mes_num)!==String(month)) return false;
+        if(turno && turno!=='all' && r.turno!==turno) return false;
+        if(search){
+          const hay = Object.values(r).some(v=> String(v).toLowerCase().includes(search));
+          if(!hay) return false;
+        }
+        return true;
+      });
 
-function renderTables(rows,s){
-  qs('tGroups').innerHTML =
-    '<thead><tr><th>#</th><th>Grupo</th><th>Dosis</th><th>%</th><th>Clasificación</th></tr></thead><tbody>' +
-    s.groups.map((g,i)=>{
-      const pct=s.total?g.value*100/s.total:0;
-      const tag = pct>=20?'<span class="pill risk">Crítico</span>':pct>=10?'<span class="pill warn">Alto</span>':'<span class="pill ok">Vigilado</span>';
-      return `<tr><td>${i+1}</td><td>${esc(g.label)}</td><td>${fmtInt(g.value)}</td><td>${pct.toFixed(1)}%</td><td>${tag}</td></tr>`;
-    }).join('') + '</tbody>';
-
-  qs('tOrigins').innerHTML =
-    '<thead><tr><th>#</th><th>Origen</th><th>Dosis</th><th>%</th></tr></thead><tbody>' +
-    s.origins.map((o,i)=>{
-      const pct=s.total?o.value*100/s.total:0;
-      return `<tr><td>${i+1}</td><td>${esc(o.label)}</td><td>${fmtInt(o.value)}</td><td>${pct.toFixed(1)}%</td></tr>`;
-    }).join('') + '</tbody>';
-
-  const ordered = rows.slice().sort((a,b)=>
-    sortNumericText(a.anio,b.anio) ||
-    MONTH_ORDER.indexOf(a.mes)-MONTH_ORDER.indexOf(b.mes) ||
-    sortNumericText(a.semana||'',b.semana||'') ||
-    sortNumericText(a.grupo,b.grupo)
-  );
-  qs('tDetail').innerHTML =
-    '<thead><tr><th>Año</th><th>Origen</th><th>Grupo objetivo</th><th>Mes</th><th>Semana</th><th>Dosis</th></tr></thead><tbody>' +
-    ordered.map(r=>`<tr><td>${esc(r.anio)}</td><td>${esc(r.origen)}</td><td>${esc(r.grupo)}</td><td>${esc(r.mes)}</td><td>${esc(r.semana||'-')}</td><td>${fmtInt(r.dosis)}</td></tr>`).join('') +
-    '</tbody>';
-}
-
-function renderKpis(s, comp){
-  const topGroupPct = s.topGroup && s.total ? (s.topGroup.value*100/s.total) : 0;
-  const yoyTxt = comp.latestVsPrev===null ? 'N/D' : `${comp.latestVsPrev>=0?'+':''}${comp.latestVsPrev.toFixed(1)}%`;
-  const weeklyTxt = s.weeklyMomentum===null ? 'N/D' : `${s.weeklyMomentum>=0?'+':''}${s.weeklyMomentum.toFixed(1)}%`;
-  const compareSub = comp.data.length>=2
-    ? `Comparación: ${esc(comp.text)}`
-    : 'Se requieren al menos 2 años con datos';
-  const kpis = [
-    {v:fmtInt(s.total), l:'Dosis visibles', sub:`${fmtInt(s.registros)} registros en vista actual`},
-    {v:s.topGroup?esc(s.topGroup.label):'-', l:'Grupo principal', sub:s.topGroup?`${fmtInt(s.topGroup.value)} dosis · ${topGroupPct.toFixed(1)}% del total`:'Sin datos'},
-    {v:s.latestYear||'-', l:'Último año visible', sub:`Mes pico: ${esc(s.peakMonth)}`},
-    {v:yoyTxt, l:'Variación interanual', sub:compareSub},
-    {v:weeklyTxt, l:'Impulso semanal reciente', sub:'Compara las dos últimas semanas registradas del último año visible'},
-    {v:`${s.concentrationPct.toFixed(1)}%`, l:'Concentración Top 3 grupos', sub:'Ayuda a focalizar territorio, agenda y campañas'}
-  ];
-  qs('kpis').innerHTML = kpis.map(k => `
-    <div class="card kpi">
-      <div class="value">${k.v}</div>
-      <div class="label">${k.l}</div>
-      <div class="subv">${k.sub}</div>
-    </div>`).join('');
-}
-
-function updateCompareControls(){
-  const mode=qs('fCompareMode').value || 'last2';
-  qs('fCompareYears').classList.toggle('hide', mode!=='manual');
-}
-
-function handleCompareModeChange(){
-  updateCompareControls();
-  if(qs('fCompareMode').value==='manual'){
-    const selected=[...qs('fCompareYears').selectedOptions];
-    if(selected.length<2){
-      const opts=[...qs('fCompareYears').options];
-      opts.slice(-2).forEach(o=>o.selected=true);
+      // update UI
+      renderKPIs();
+      renderMonthlyChart();
+      renderDonut();
+      renderTrend();
+      renderPeriodoTable();
+      renderAllTable();
+      renderComparativa();
+      renderTop5();
     }
-  }
-  renderAll();
-}
 
-function handleCompareYearsChange(){
-  const selected=[...qs('fCompareYears').selectedOptions];
-  if(selected.length>3){
-    selected.slice(3).forEach(o=>o.selected=false);
-    alert('Solo puede comparar hasta 3 años.');
-  }
-  renderAll();
-}
-
-function renderAll(){
-  if(!rowsMaster.length){
-    qs('nodata').classList.remove('hide');
-    qs('dash').classList.add('hide');
-    return;
-  }
-  qs('nodata').classList.add('hide');
-  qs('dash').classList.remove('hide');
-
-  const rows=filteredRows();
-  const baseRows=baseRowsForComparison();
-  const s=summarize(rows);
-  const comp=summarizeComparison(baseRows);
-
-  const visibleYears=[...new Set(rows.map(r=>r.anio))].sort(sortNumericText).join(', ') || '-';
-  const compareYears=comp.years.length ? comp.years.join(', ') : '-';
-  qs('info').innerHTML = `<b>Vista actual:</b> ${fmtInt(s.total)} dosis · <b>Años visibles:</b> ${esc(visibleYears)} · <b>Comparación:</b> ${esc(compareYears)} · <b>Concentración:</b> ${statusPill(s.concentrationPct)}`;
-
-  renderKpis(s, comp);
-  const alerts = buildAlerts(s,rows,comp);
-  qs('alerts').innerHTML = alerts.map(a=>`<div class="alert ${a.cls}"><div class="t">${a.t}</div><div>${a.d}</div></div>`).join('');
-
-  renderBars('groupsChart', s.groups.slice(0,10));
-  renderBars('yearsChart', comp.data);
-  qs('compareTitle').textContent = `Comparación por año · ${comp.data.length || 0} año(s)`;
-  qs('compareHelp').textContent = comp.data.length>=2
-    ? `Años comparados: ${comp.text}. Puede usar últimos 2, últimos 3 o selección manual.`
-    : 'Se requieren al menos 2 años con datos para comparar.';
-
-  const fy=qs('fYear').value||'Todos';
-  let evoData=[], evoTitle='Evolución del período';
-  if(fy!=='Todos'){
-    const weekRows = rows.filter(r=>r.anio===fy && safe(r.semana));
-    const weekMap={};
-    weekRows.forEach(r=>{ const k=safe(r.semana); weekMap[k]=(weekMap[k]||0)+r.dosis; });
-    evoData = Object.entries(weekMap).sort((a,b)=>sortNumericText(a[0],b[0])).map(([label,value])=>({label:'S'+label,value}));
-    if(evoData.length){ evoTitle = `Evolución semanal · ${fy}`; }
-    else {
-      const monthMap={};
-      rows.filter(r=>r.anio===fy).forEach(r=>{ monthMap[r.mes]=(monthMap[r.mes]||0)+r.dosis; });
-      evoData = MONTH_ORDER.filter(m=>monthMap[m]!==undefined).map(m=>({label:m.slice(0,3),value:monthMap[m]}));
-      evoTitle = `Evolución mensual · ${fy}`;
-    }
-  } else {
-    evoData = s.months.map(m=>({label:m.label.slice(0,3),value:m.value}));
-    evoTitle = 'Evolución mensual visible';
-  }
-  qs('evolutionTitle').textContent=evoTitle;
-  renderCols('evolutionChart', evoData);
-
-  qs('recommendations').innerHTML = buildRecommendations(s, comp).map((r,i)=>`${i+1}. ${r}`).join('<hr class="sep">');
-  renderTables(rows,s);
-}
-
-function resetFilters(){
-  if(!rowsMaster.length) return;
-  qs('fYear').value='Todos';
-  qs('fOrigin').value='Todos';
-  qs('fMonth').value='Todos';
-  qs('fWeek').value='Todas';
-  qs('fGroup').value='';
-  qs('fCompareMode').value='last2';
-  populateComparisonYearOptions();
-  updateCompareControls();
-  renderAll();
-}
-
-function getEpiWeek(date){
-  const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
-  const dayNum=d.getUTCDay()||7;
-  d.setUTCDate(d.getUTCDate()+4-dayNum);
-  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
-  return Math.ceil((((d-yearStart)/86400000)+1)/7);
-}
-function updateHeaderClocks(source='local'){
-  const now=new Date();
-  qs('badgeWeek').textContent = 'Semana epidemiológica: ' + getEpiWeek(now);
-  qs('badgeUpdated').textContent = 'Actualizado: ' + now.toLocaleString('es-CL');
-  qs('badgeSource').textContent = 'Fuente: ' + source;
-}
-
-function applyRows(rows, sourceLabel){
-  rowsMaster = rows.filter(r=>r && safe(r.anio) && safe(r.grupo) && safe(r.mes));
-  saveRows();
-  populateFilters();
-  updateHeaderClocks(sourceLabel);
-  renderAll();
-}
-
-async function tryLoadDefaultJson(){
-  try{
-    const resp = await fetch('./influenza.json?v=' + Date.now(), {cache:'no-store'});
-    if(!resp.ok) throw new Error('HTTP '+resp.status);
-    const parsed = await resp.json();
-    const rows = extractRowsFromJson(parsed);
-    if(!rows.length) throw new Error('El JSON no contiene registros válidos');
-    applyRows(rows, 'influenza.json');
-  }catch(err){
-    console.error(err);
-    if(!rowsMaster.length){
-      updateHeaderClocks('sin datos');
-      renderAll();
-    }
-  }
-}
-
-function downloadCurrentJson(){
-  if(!rowsMaster.length) return alert('No hay datos cargados.');
-  const blob = new Blob([JSON.stringify(rowsMaster,null,2)], {type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='dashboard_datos_actuales.json';
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-
-function bindJsonLoader(){
-  qs('btnLoadJson').addEventListener('click',()=>{
-    const pass = prompt('Ingrese clave para actualizar el JSON:');
-    if(pass===null) return;
-    if(pass !== UPDATE_PASSWORD){
-      alert('Clave incorrecta.');
-      return;
-    }
-    qs('jsonfile').click();
-  });
-  qs('jsonfile').addEventListener('change',e=>{
-    const f=e.target.files?.[0];
-    if(!f) return;
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      try{
-        const parsed=JSON.parse(ev.target.result);
-        const rows=extractRowsFromJson(parsed);
-        if(!rows.length) throw new Error('No se encontraron registros válidos en el JSON.');
-        applyRows(rows, f.name + ' · carga manual');
-        alert('Datos actualizados correctamente desde JSON.');
-      }catch(err){
-        alert('No se pudo actualizar: ' + err.message);
-      }finally{
-        qs('jsonfile').value='';
+    /***********************
+     * KPIs
+     ***********************/
+    function computeKPIs(records){
+      const total = records.reduce((s,r)=>s+safeNum(r.cantidad),0);
+      const max = records.reduce((m,r)=>Math.max(m,safeNum(r.cantidad)),0);
+      const avg = records.length? (total/records.length):0;
+      // variation vs previous period (simple: compare to same period previous year for same filters)
+      const currentYear = state.year==='all'?null: Number(state.year);
+      let variation = null;
+      if(currentYear){
+        const prev = DATA.registros.filter(r=>{
+          if(String(r.año)!==String(currentYear-1)) return false;
+          if(state.month!=='all' && String(r.mes_num)!==String(state.month)) return false;
+          return true;
+        });
+        const prevTotal = prev.reduce((s,r)=>s+safeNum(r.cantidad),0);
+        variation = prevTotal? ((total - prevTotal)/prevTotal)*100 : null;
       }
-    };
-    reader.readAsText(f);
-  });
-}
-
-async function init(){
-  loadRows();
-  bindJsonLoader();
-  updateCompareControls();
-
-  if(location.protocol === 'file:'){
-    if(rowsMaster.length){
-      populateFilters();
-      updateHeaderClocks('almacenamiento local');
-      renderAll();
-    }else{
-      updateHeaderClocks('archivo local');
-      renderAll();
+      return {total,max,avg,variation};
     }
-    return;
-  }
 
-  try{
-    const resp = await fetch('./influenza.json?v=' + Date.now(), {cache:'no-store'});
-    if(!resp.ok) throw new Error('HTTP ' + resp.status);
-    const parsed = await resp.json();
-    const rows = extractRowsFromJson(parsed);
-    if(!rows.length) throw new Error('El JSON no contiene registros válidos');
-    applyRows(rows, 'influenza.json · carga automática');
-  }catch(err){
-    console.error(err);
-    if(rowsMaster.length){
-      populateFilters();
-      updateHeaderClocks('almacenamiento local');
-      renderAll();
-    }else{
-      updateHeaderClocks('sin datos');
-      renderAll();
+    function renderKPIs(){
+      const kpiGrid = $('kpiGrid'); kpiGrid.innerHTML='';
+      const k = computeKPIs(filtered);
+      const items = [
+        {title:'Total', value:k.total, icon:'📦', delta:k.variation},
+        {title:'Máximo', value:k.max, icon:'📈'},
+        {title:'Promedio', value:Math.round(k.avg*100)/100, icon:'⚖️'},
+        {title:'Registros', value:filtered.length, icon:'🧾'},
+        {title:'Área', value:DATA.meta.area || '—', icon:'🏷️'}
+      ];
+      items.forEach(it=>{
+        const div = document.createElement('div'); div.className='kpi';
+        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="muted">${it.title}</div>
+            <div class="value">${it.value}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:20px">${it.icon}</div>
+            <div class="delta">${it.delta===undefined? '' : (it.delta===null?'<span class="muted">sin periodo previo</span>': (it.delta>=0?`<span style="color:var(--accent-green)">▲ ${Math.round(it.delta*100)/100}%</span>`:`<span style="color:var(--accent-red)">▼ ${Math.round(it.delta*100)/100}%</span>`))}</div>
+          </div>
+        </div>`;
+        kpiGrid.appendChild(div);
+      });
     }
-  }
-}
-init();
-</script>
+
+    /***********************
+     * Charts
+     ***********************/
+    function renderMonthlyChart(){
+      const ctx = $('barMonthly').getContext('2d');
+      const year = $('filterYear').value;
+      const months = Array.from({length:12},(_,i)=>i+1);
+      const labels = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      const counts = months.map(m=>{
+        return DATA.registros.filter(r=>{
+          if(year!=='all' && String(r.año)!==String(year)) return false;
+          return Number(r.mes_num)===m;
+        }).reduce((s,r)=>s+safeNum(r.cantidad),0);
+      });
+      if(charts.barMonthly) charts.barMonthly.destroy();
+      charts.barMonthly = new Chart(ctx,{
+        type:'bar',
+        data:{labels, datasets:[{label:'Cantidad',data:counts,backgroundColor: 'rgba(14,165,233,0.9)'}]},
+        options:{animation:{duration:500},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+      });
+    }
+
+    function renderDonut(){
+      const ctx = $('donutCategory').getContext('2d');
+      const map = {};
+      filtered.forEach(r=> map[r.categoria] = (map[r.categoria]||0)+safeNum(r.cantidad));
+      const labels = Object.keys(map).length?Object.keys(map):['Sin categoría'];
+      const data = labels.map(l=>map[l]||0);
+      if(charts.donutCategory) charts.donutCategory.destroy();
+      charts.donutCategory = new Chart(ctx,{
+        type:'doughnut',
+        data:{labels,data: data, datasets:[{backgroundColor:['#0ea5e9','#10b981','#f59e0b','#ef4444','#64748b']}]},
+        options:{animation:{duration:500},plugins:{legend:{position:'bottom'}}}
+      });
+    }
+
+    function renderTrend(){
+      const ctx = $('lineTrend').getContext('2d');
+      // trend: monthly totals across last 12 months
+      const months = [];
+      const now = new Date();
+      for(let i=11;i>=0;i--){
+        const d = new Date(now.getFullYear(), now.getMonth()-i,1);
+        months.push({año:d.getFullYear(), mes_num:d.getMonth()+1, label: d.toLocaleString('es-CL',{month:'short',year:'numeric'})});
+      }
+      const data = months.map(m=>{
+        return DATA.registros.filter(r=> r.año==m.año && Number(r.mes_num)===m.mes_num).reduce((s,r)=>s+safeNum(r.cantidad),0);
+      });
+      if(charts.lineTrend) charts.lineTrend.destroy();
+      charts.lineTrend = new Chart(ctx,{
+        type:'line',
+        data:{labels:months.map(m=>m.label),datasets:[{label:'Tendencia',data:data,borderColor:getComputedStyle(document.body).getPropertyValue('--accent-green'),tension:0.3,fill:false}]},
+        options:{animation:{duration:500}}
+      });
+    }
+
+    /***********************
+     * Tab switching and UI events
+     ***********************/
+    document.querySelectorAll('#tabs .tab').forEach(t=>{
+      t.addEventListener('click',()=>{
+        document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        const tab = t.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(s=>s.classList.add('hidden'));
+        document.getElementById(tab).classList.remove('hidden');
+      });
+    });
+
+    // Import JSON modal
+    document.getElementById('importJsonBtn').addEventListener('click',()=> document.getElementById('importModal').classList.remove('hidden'));
+    document.getElementById('importCancel').addEventListener('click',()=> document.getElementById('importModal').classList.add('hidden'));
+    document.getElementById('importConfirm').addEventListener('click',()=>{
+      const pwd = document.getElementById('importPassword').value;
+      const fileInput = document.getElementById('importFile');
+      if(pwd !== IMPORT_KEY){ document.getElementById('importMsg').textContent = 'Clave incorrecta'; return; }
+      if(!fileInput.files.length){ document.getElementById('importMsg').textContent = 'Seleccione un archivo .json'; return; }
+      const f = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = e => {
+        try{
+          const j = JSON.parse(e.target.result);
+          DATA = j;
+          postLoad();
+          document.getElementById('importModal').classList.add('hidden');
+          document.getElementById('importMsg').textContent = '';
+          document.getElementById('status') && (document.getElementById('status').textContent = 'Datos importados localmente');
+        }catch(err){ document.getElementById('importMsg').textContent = 'JSON inválido'; }
+      };
+      reader.readAsText(f);
+    });
+
+    // Refresh button
+    document.getElementById('refreshBtn').addEventListener('click', loadRemoteJSON);
+
+    // Export Excel
+    document.getElementById('exportExcel').addEventListener('click',()=>{
+      const dataToExport = filtered.length ? filtered : (DATA ? DATA.registros : []);
+      if(!dataToExport.length){ alert('No hay datos para exportar'); return; }
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Datos');
+      const today = new Date().toISOString().slice(0,10);
+      XLSX.writeFile(wb,`datos_export_${today}.xlsx`);
+    });
+
+    // Print current tab
+    document.getElementById('printTab').addEventListener('click', ()=> window.print());
+
+    // About modal
+    document.getElementById('aboutBtn').addEventListener('click', ()=> document.getElementById('aboutModal').classList.remove('hidden'));
+    document.getElementById('aboutClose').addEventListener('click', ()=> document.getElementById('aboutModal').classList.add('hidden'));
+
+    // Filters
+    document.getElementById('filterYear').addEventListener('change', applyFilters);
+    document.getElementById('filterMonth').addEventListener('change', applyFilters);
+    document.getElementById('filterTurno') && document.getElementById('filterTurno').addEventListener('change', applyFilters);
+    document.getElementById('globalSearch').addEventListener('input', applyFilters);
+
+    // Initial load
+    (function init(){
+      // try local datos.json first
+      fetch('datos.json?_=' + Date.now()).then(r=>{ if(r.ok) return r.json(); throw new Error('no local'); }).then(j=>{
+        DATA = j; postLoad();
+      }).catch(()=> loadRemoteJSON());
+      startClock();
+    })();
+  </script>
 </body>
 </html>
