@@ -1,652 +1,535 @@
-﻿<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Profesional — Rodrigo Villalobos R.</title>
-
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-  <!-- SheetJS -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-  <style>
-    :root{
-      --bg-main:#0f172a;
-      --bg-card:#1e293b;
-      --border:#334155;
-      --accent-cyan:#0ea5e9;
-      --accent-green:#10b981;
-      --accent-amber:#f59e0b;
-      --accent-red:#ef4444;
-      --text:#e6eef8;
-      --muted:#94a3b8;
-      font-family:'Outfit',sans-serif;
-    }
-    [data-theme="light"]{
-      --bg-main:#f8fafc;
-      --bg-card:#ffffff;
-      --border:#e6eef8;
-      --text:#0b1220;
-      --muted:#475569;
-    }
-    html,body{height:100%;margin:0;background:var(--bg-main);color:var(--text);-webkit-font-smoothing:antialiased}
-    .app{max-width:1200px;margin:18px auto;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-    .brand h1{font-size:18px;margin:0}
-    .meta{font-size:12px;color:var(--muted)}
-    .header-right{display:flex;align-items:center;gap:10px}
-    .clock{font-weight:600}
-    .btn{background:var(--bg-card);border:1px solid var(--border);padding:8px 10px;border-radius:8px;color:var(--text);cursor:pointer}
-    .btn:hover{box-shadow:0 12px 30px rgba(14,165,233,0.08);border-color:var(--accent-cyan)}
-    nav{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-    .tab{padding:10px 12px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border);cursor:pointer}
-    .tab.active{box-shadow:0 12px 30px rgba(14,165,233,0.08);border-color:var(--accent-cyan)}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
-    .kpi{background:var(--bg-card);padding:14px;border-radius:12px;border:1px solid var(--border);transition:all .18s}
-    .kpi:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(14,165,233,0.08);border-color:rgba(14,165,233,0.18)}
-    .kpi .value{font-size:22px;font-weight:700}
-    .kpi .delta{font-size:13px}
-    .charts{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
-    .chart-card{background:var(--bg-card);padding:12px;border-radius:12px;border:1px solid var(--border)}
-    .table-card{background:var(--bg-card);padding:12px;border-radius:12px;border:1px solid var(--border);overflow:auto}
-    .hidden{display:none}
-    .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.08);border-top-color:var(--accent-cyan);border-radius:50%;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .flex{display:flex;align-items:center;gap:8px}
-    .muted{color:var(--muted)}
-    .search{padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
-    table{width:100%;border-collapse:collapse;color:var(--text)}
-    th,td{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left;font-size:13px}
-    th.sortable{cursor:pointer}
-    .pagination{display:flex;gap:6px;align-items:center;justify-content:center;padding:8px}
-    .page-btn{padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
-    .top5-bar{height:28px;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-green));border-radius:6px}
-    @media print{
-      body{background:#fff;color:#000}
-      .no-print{display:none}
-      .app{max-width:100%;margin:0;padding:0}
-      header,nav,.controls{display:none}
-      .chart-card, .table-card{border:1px solid #ddd}
-    }
-    @media (max-width:1024px){
-      .card-grid{grid-template-columns:repeat(2,1fr)}
-      .charts{grid-template-columns:1fr}
-    }
-    @media (max-width:640px){
-      .card-grid{grid-template-columns:1fr}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Vacunación Antiinfluenza</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg-main:#0f172a;--bg-card:#1e293b;--bg-card2:#162032;--border:#334155;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#0ea5e9;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#a855f7;--pink:#ec4899;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4)}
+.light{--bg-main:#f1f5f9;--bg-card:#ffffff;--bg-card2:#f8fafc;--border:#e2e8f0;--text:#1e293b;--text-muted:#64748b;--shadow:0 2px 12px rgba(0,0,0,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg-main);color:var(--text);min-height:100vh;font-size:14px}
+#header{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+.light #header{background:linear-gradient(135deg,#1e40af 0%,#3b82f6 50%,#1e40af 100%)}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-logo{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.header-title h1{font-size:17px;font-weight:700;color:#fff;letter-spacing:.3px}
+.header-title p{font-size:11px;color:#93c5fd;margin-top:1px}
+.header-center{display:flex;flex-direction:column;align-items:center;gap:2px}
+#clock{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:2px}
+#dateh{font-size:11px;color:#93c5fd}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.author-info{font-size:11px;color:#93c5fd;text-align:right}
+.author-info a{color:#60a5fa;text-decoration:none}
+.author-info a:hover{text-decoration:underline}
+#toolbar{background:var(--bg-card);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.2s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#0284c7}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#059669}
+.btn-warning{background:var(--amber);color:#fff}.btn-warning:hover{background:#d97706}
+.btn-info{background:var(--purple);color:#fff}.btn-info:hover{background:#9333ea}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}.btn-ghost:hover{background:var(--border);color:var(--text)}
+.btn-toggle{background:var(--bg-card2);color:var(--text);border:1px solid var(--border)}.btn-toggle:hover{background:var(--border)}
+#tabs{background:var(--bg-card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+.tab{padding:12px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;color:var(--text-muted);transition:.2s;white-space:nowrap}
+.tab:hover{color:var(--text);background:var(--bg-card2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+#main{padding:20px;max-width:1600px;margin:0 auto}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.filter-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-bar label{font-size:12px;font-weight:600;color:var(--text-muted)}
+select,input[type=text]{background:var(--bg-card2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:7px;font-family:inherit;font-size:13px;cursor:pointer}
+select:focus,input[type=text]:focus{outline:none;border-color:var(--accent)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;transition:.2s;cursor:default}
+.kpi-card:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(14,165,233,.2);transform:translateY(-2px)}
+.kpi-icon{font-size:22px;margin-bottom:8px}
+.kpi-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-value{font-size:26px;font-weight:700;color:var(--text)}
+.kpi-delta{font-size:12px;margin-top:4px;font-weight:600}
+.kpi-delta.up{color:var(--green)}.kpi-delta.down{color:var(--red)}.kpi-delta.neutral{color:var(--text-muted)}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px;margin-bottom:20px}
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.chart-card h3{font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.chart-wrap{position:relative;height:220px}
+.chart-wrap-lg{position:relative;height:280px}
+.table-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
+.table-wrap table{width:100%;border-collapse:collapse}
+.table-wrap th{background:var(--bg-card2);color:var(--text-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+.table-wrap th:hover{color:var(--accent)}
+.table-wrap td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.table-wrap tr:last-child td{border-bottom:none}
+.table-wrap tr:hover td{background:var(--bg-card2)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-blue{background:rgba(14,165,233,.15);color:var(--accent)}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.rank-item{background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.rank-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.rank-bar-wrap{flex:1}
+.rank-name{font-size:13px;font-weight:600;margin-bottom:5px}
+.rank-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.rank-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.rank-stats{text-align:right;font-size:12px;color:var(--text-muted);min-width:90px}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border)}
+.page-info{font-size:12px;color:var(--text-muted)}
+.page-btns{display:flex;gap:5px}
+.page-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card2);color:var(--text-muted);cursor:pointer;font-size:12px}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page-btn:hover:not(.active){background:var(--border);color:var(--text)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:440px;box-shadow:var(--shadow)}
+.modal h2{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--accent)}
+.modal input{width:100%;background:var(--bg-card2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:12px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.modal-info{font-size:13px;color:var(--text-muted);margin-bottom:10px;line-height:1.6}
+#spinner{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
+#spinner.show{display:flex}
+.spin{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';display:block;width:4px;height:18px;background:var(--accent);border-radius:2px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.search-wrap{padding:10px 14px;border-bottom:1px solid var(--border)}
+.search-wrap input{width:100%;background:var(--bg-card2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-family:inherit;font-size:13px}
+.no-data{padding:40px;text-align:center;color:var(--text-muted)}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}.charts-grid{grid-template-columns:1fr}}
+@media print{#header,#toolbar,#tabs,.filter-bar,.btn,#spinner{display:none!important}.tab-content{display:none!important}.tab-content.active{display:block!important}body{background:#fff}}
+</style>
 </head>
 <body>
-  <div class="app" id="app" data-theme="dark">
-    <header>
-      <div class="brand">
-        <div>
-          <h1>Dashboard Recursos Humanos</h1>
-          <div class="meta">
-            Autor: <strong>Rodrigo Villalobos R.</strong> · Correo: <strong>rodrigovillalobos1978@gmail.com</strong>
-          </div>
-        </div>
-      </div>
 
-      <div class="header-right no-print">
-        <div class="meta">
-          <div><span id="clock" class="clock">--:--:--</span></div>
-          <div id="fecha" class="muted">--</div>
-          <div class="muted">Última actualización: <span id="ultima_actualizacion">--</span></div>
-        </div>
-
-        <button class="btn" id="themeToggle" title="Toggle tema">🌗</button>
-      </div>
-    </header>
-
-    <!-- Global buttons -->
-    <div class="no-print">
-      <div class="flex" style="justify-content:space-between">
-        <nav id="tabs" aria-label="Pestañas">
-          <div class="tab active" data-tab="resumen">📊 Resumen General</div>
-          <div class="tab" data-tab="periodo">📅 Análisis por Período</div>
-          <div class="tab" data-tab="comparativa">📈 Comparativa Multi-Período</div>
-          <div class="tab" data-tab="top5">🏆 Top 5 Diagnósticos</div>
-          <div class="tab" data-tab="datos">🗃️ Datos Completos</div>
-        </nav>
-
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn" id="exportExcel">📤 Exportar Excel</button>
-          <button class="btn" id="printTab">🖨️ Imprimir Pestaña</button>
-          <button class="btn" id="importJsonBtn">📥 Importar JSON</button>
-          <button class="btn" id="refreshBtn">🔄 Actualizar</button>
-          <button class="btn" id="aboutBtn">ℹ️ Acerca de</button>
-        </div>
-      </div>
+<div id="header">
+  <div class="header-left">
+    <div class="header-logo">💉</div>
+    <div class="header-title">
+      <h1>Dashboard — Campaña Antiinfluenza</h1>
+      <p>Epidemiología · Salud Pública · Región Ñuble</p>
     </div>
+  </div>
+  <div class="header-center">
+    <div id="clock">--:--:--</div>
+    <div id="dateh">--</div>
+  </div>
+  <div class="header-right">
+    <div class="author-info">Autor: <strong>Rodrigo Villalobos R.</strong></div>
+    <div class="author-info">Mail: <a href="mailto:rodrigovillalobos1978@gmail.com">rodrigovillalobos1978@gmail.com</a></div>
+    <div class="author-info" id="last-update-hdr">Última actualización: —</div>
+  </div>
+</div>
 
-    <hr style="border:none;height:12px">
+<div id="toolbar">
+  <button class="btn btn-success" onclick="exportExcel()">📤 Exportar Excel</button>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
+  <button class="btn btn-warning" onclick="openImportModal()">📥 Importar JSON</button>
+  <button class="btn btn-info" onclick="refreshData()">🔄 Actualizar</button>
+  <button class="btn btn-ghost" onclick="openAbout()">ℹ️ Acerca de</button>
+  <button class="btn btn-toggle" id="themeBtn" onclick="toggleTheme()">☀️ Modo Claro</button>
+</div>
 
-    <!-- Filters -->
-    <div class="controls no-print">
-      <label class="muted">Año:
-        <select id="filterYear" class="btn">
-          <option value="all">Todos</option>
-        </select>
-      </label>
+<div id="tabs">
+  <div class="tab active" data-tab="resumen">📊 Resumen General</div>
+  <div class="tab" data-tab="periodo">📅 Por Período</div>
+  <div class="tab" data-tab="comparativa">📈 Comparativa</div>
+  <div class="tab" data-tab="top5">🏆 Top Grupos</div>
+  <div class="tab" data-tab="datos">🗃️ Datos Completos</div>
+</div>
 
-      <label class="muted">Mes:
-        <select id="filterMonth" class="btn">
-          <option value="all">Todos</option>
-        </select>
-      </label>
+<div id="main">
 
-      <label id="turnoFilterLabel" class="muted hidden">Turno:
-        <select id="filterTurno" class="btn">
-          <option value="all">Todos</option>
-        </select>
-      </label>
-
-      <label class="muted">Buscar:
-        <input id="globalSearch" class="search" placeholder="Buscar en todas las columnas">
-      </label>
-
-      <div style="margin-left:auto" id="loadingIndicator" class="flex hidden">
-        <div class="spinner"></div><div class="muted">Cargando...</div>
-      </div>
+  <!-- TAB 1 -->
+  <div class="tab-content active" id="tab-resumen">
+    <div class="filter-bar">
+      <label>Año:</label><select id="r-anio"><option value="all">Todos</option></select>
+      <label>Mes:</label><select id="r-mes"><option value="all">Todos</option></select>
+      <label>Origen:</label><select id="r-origen"><option value="all">Todos</option></select>
     </div>
-
-    <!-- Content area -->
-    <main>
-      <!-- Resumen -->
-      <section id="resumen" class="tab-content">
-        <div class="card-grid" id="kpiGrid">
-          <!-- KPI cards injected here -->
-        </div>
-
-        <div class="charts">
-          <div class="chart-card">
-            <h3 style="margin:0 0 8px 0">Distribución mensual — Año seleccionado</h3>
-            <canvas id="barMonthly" height="160"></canvas>
-          </div>
-
-          <div class="chart-card">
-            <h3 style="margin:0 0 8px 0">Distribución por categoría</h3>
-            <canvas id="donutCategory" height="160"></canvas>
-          </div>
-
-          <div class="chart-card" style="grid-column:1/3;margin-top:12px">
-            <h3 style="margin:0 0 8px 0">Tendencia indicador principal</h3>
-            <canvas id="lineTrend" height="120"></canvas>
-          </div>
-        </div>
-      </section>
-
-      <!-- Análisis por Período -->
-      <section id="periodo" class="tab-content hidden">
-        <div class="chart-card">
-          <h3>KPIs del período</h3>
-          <div id="periodoKPIs" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px"></div>
-        </div>
-
-        <div class="table-card" style="margin-top:12px">
-          <h3>Tabla detallada</h3>
-          <div style="overflow:auto">
-            <table id="tablePeriodo">
-              <thead id="theadPeriodo"></thead>
-              <tbody id="tbodyPeriodo"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- Comparativa -->
-      <section id="comparativa" class="tab-content hidden">
-        <div class="chart-card">
-          <h3>Comparativa Multi-Período</h3>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-            <label class="muted">Tipo:
-              <select id="comparativaTipo" class="btn">
-                <option value="años">Años</option>
-                <option value="meses">Meses</option>
-              </select>
-            </label>
-
-            <label class="muted">Seleccionar (2–5):
-              <select id="comparativaSelector" class="btn" multiple size="3" style="min-width:220px"></select>
-            </label>
-          </div>
-
-          <canvas id="comparativaChart" height="160"></canvas>
-        </div>
-
-        <div class="table-card" style="margin-top:12px">
-          <h3>Tabla comparativa</h3>
-          <div id="comparativaTableWrap"></div>
-        </div>
-      </section>
-
-      <!-- Top 5 -->
-      <section id="top5" class="tab-content hidden">
-        <div class="chart-card">
-          <h3>Top 5 Diagnósticos / Actividades</h3>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-            <label class="muted">Período:
-              <select id="top5Periodo" class="btn">
-                <option value="all">Todos</option>
-              </select>
-            </label>
-            <button class="btn" id="top5CompareBtn">Comparar vs período anterior</button>
-          </div>
-
-          <div id="top5Content"></div>
-        </div>
-      </section>
-
-      <!-- Datos completos -->
-      <section id="datos" class="tab-content hidden">
-        <div class="table-card">
-          <h3>Datos completos</h3>
-          <div style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-            <div class="muted">Total registros: <span id="totalRegistros">0</span></div>
-            <div>
-              <label class="muted">Mostrar:
-                <select id="pageSize" class="btn">
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
-              </label>
-            </div>
-          </div>
-
-          <div style="overflow:auto">
-            <table id="tableAll">
-              <thead id="theadAll"></thead>
-              <tbody id="tbodyAll"></tbody>
-            </table>
-          </div>
-
-          <div class="pagination" id="pagination"></div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Modals -->
-    <div id="importModal" class="no-print hidden" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center">
-      <div style="background:var(--bg-card);border:1px solid var(--border);padding:18px;border-radius:12px;width:420px;box-shadow:var(--shadow)">
-        <h3>Importar JSON (modo local)</h3>
-        <p class="muted">Ingrese la clave y seleccione el archivo .json</p>
-        <input id="importPassword" type="password" placeholder="Clave" class="search" style="width:100%;margin-bottom:8px">
-        <input id="importFile" type="file" accept=".json" style="width:100%;margin-bottom:8px">
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn" id="importCancel">Cancelar</button>
-          <button class="btn" id="importConfirm">Cargar</button>
-        </div>
-        <div id="importMsg" class="muted" style="margin-top:8px"></div>
-      </div>
+    <div class="kpi-grid" id="kpi-resumen"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><h3>📊 Dosis por Mes</h3><div class="chart-wrap"><canvas id="c-meses"></canvas></div></div>
+      <div class="chart-card"><h3>📈 Tendencia Histórica por Año</h3><div class="chart-wrap"><canvas id="c-anios"></canvas></div></div>
+      <div class="chart-card"><h3>🍩 Top 10 Grupos Objetivo</h3><div class="chart-wrap"><canvas id="c-dona"></canvas></div></div>
+      <div class="chart-card"><h3>📉 Comparativa Últimos 4 Años</h3><div class="chart-wrap"><canvas id="c-comp4"></canvas></div></div>
     </div>
-
-    <div id="aboutModal" class="no-print hidden" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center">
-      <div style="background:var(--bg-card);border:1px solid var(--border);padding:18px;border-radius:12px;width:520px;box-shadow:var(--shadow)">
-        <h3>Sistema de Dashboard</h3>
-        <p><strong>Nombre:</strong> Dashboard Recursos Humanos</p>
-        <p><strong>Versión:</strong> 1.0</p>
-        <p><strong>Autor:</strong> Rodrigo Villalobos R. — rodrigovillalobos1978@gmail.com</p>
-        <p><strong>Última actualización JSON:</strong> <span id="aboutUltima">--</span></p>
-        <p><strong>Total registros:</strong> <span id="aboutTotal">--</span></p>
-        <div style="display:flex;justify-content:flex-end;gap:8px">
-          <button class="btn" id="aboutClose">Cerrar</button>
-        </div>
-      </div>
-    </div>
-
   </div>
 
-  <script>
-    /***********************
-     * Configuración inicial
-     ***********************/
-    const JSON_URL = 'https://[USUARIO].github.io/[REPO]/datos.json'; // editar al desplegar
-    const IMPORT_KEY = 'Zoe2023@';
-    let DATA = null;
-    let filtered = [];
-    let currentTab = 'resumen';
-    let charts = {};
-    let state = {
-      year:'all', month:'all', turno:'all', search:'', page:1, pageSize:20
-    };
+  <!-- TAB 2 -->
+  <div class="tab-content" id="tab-periodo">
+    <div class="filter-bar">
+      <label>Año:</label><select id="p-anio"></select>
+      <label>Mes:</label><select id="p-mes"><option value="all">Todos</option></select>
+    </div>
+    <div class="kpi-grid" id="kpi-periodo"></div>
+    <div class="two-col">
+      <div class="chart-card"><h3>📊 Dosis por Grupo Objetivo</h3><div class="chart-wrap-lg"><canvas id="c-pgrupo"></canvas></div></div>
+      <div class="chart-card"><h3>📅 Evolución Mensual del Año</h3><div class="chart-wrap-lg"><canvas id="c-pmensual"></canvas></div></div>
+    </div>
+    <div class="section-title">Detalle por Grupo</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Grupo Objetivo</th><th>Mes</th><th>Dosis</th><th>% del Total</th></tr></thead>
+      <tbody id="tb-periodo"></tbody>
+    </table></div>
+  </div>
 
-    /***********************
-     * Utilidades
-     ***********************/
-    function $(id){return document.getElementById(id)}
-    function formatDateISO(d){ return new Date(d).toISOString().slice(0,19) }
-    function safeNum(v){return isNaN(Number(v))?0:Number(v)}
-    function show(id){$(id).classList.remove('hidden')}
-    function hide(id){$(id).classList.add('hidden')}
+  <!-- TAB 3 -->
+  <div class="tab-content" id="tab-comparativa">
+    <div class="filter-bar">
+      <label>Años (2–5):</label>
+      <select id="cmp-y1"></select>
+      <select id="cmp-y2"></select>
+      <select id="cmp-y3"><option value="">—</option></select>
+      <select id="cmp-y4"><option value="">—</option></select>
+      <select id="cmp-y5"><option value="">—</option></select>
+      <button class="btn btn-primary" onclick="renderComparativa()">Comparar</button>
+    </div>
+    <div class="kpi-grid" id="kpi-cmp"></div>
+    <div class="chart-card" style="margin-bottom:16px"><h3>📊 Dosis Mensuales por Año</h3><div class="chart-wrap-lg"><canvas id="c-cmp-mes"></canvas></div></div>
+    <div class="section-title">Tabla Comparativa por Mes</div>
+    <div class="table-wrap"><table><thead id="th-cmp"></thead><tbody id="tb-cmp"></tbody></table></div>
+  </div>
 
-    /***********************
-     * Reloj y fecha
-     ***********************/
-    function startClock(){
-      const clock = $('clock'), fecha = $('fecha');
-      function tick(){
-        const now = new Date();
-        clock.textContent = now.toLocaleTimeString();
-        fecha.textContent = now.toLocaleDateString();
-      }
-      tick();
-      setInterval(tick,1000);
-    }
+  <!-- TAB 4 -->
+  <div class="tab-content" id="tab-top5">
+    <div class="filter-bar">
+      <label>Año:</label><select id="t5-anio"><option value="all">Todos</option></select>
+      <label>Mes:</label><select id="t5-mes"><option value="all">Todos</option></select>
+      <label>Top:</label>
+      <select id="t5-n"><option value="5">Top 5</option><option value="10">Top 10</option><option value="15">Top 15</option></select>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="section-title">🏆 Ranking por Dosis</div>
+        <div id="ranking-list"></div>
+      </div>
+      <div class="chart-card"><h3>📊 Distribución Visual</h3><div class="chart-wrap-lg"><canvas id="c-top5"></canvas></div></div>
+    </div>
+    <div class="section-title">Tabla Detallada</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Grupo Objetivo</th><th>Dosis</th><th>% Total</th><th>Var. vs Año Ant.</th></tr></thead>
+      <tbody id="tb-top5"></tbody>
+    </table></div>
+  </div>
 
-    /***********************
-     * Carga de datos
-     ***********************/
-    async function loadRemoteJSON(){
-      $('loadingIndicator').classList.remove('hidden');
-      try{
-        const res = await fetch(JSON_URL + '?_=' + Date.now());
-        if(!res.ok) throw new Error('fetch error');
-        const j = await res.json();
-        DATA = j;
-        postLoad();
-      }catch(e){
-        console.warn('Fetch falló, usando fallback si existe',e);
-        if(!DATA) {
-          // fallback: usar datos.json embebido si existe en la misma carpeta
-          try{
-            const res2 = await fetch('datos.json?_=' + Date.now());
-            if(res2.ok){ DATA = await res2.json(); postLoad(); }
-            else { console.error('No hay datos disponibles'); }
-          }catch(err){ console.error(err); }
-        }
-      }finally{
-        $('loadingIndicator').classList.add('hidden');
-      }
-    }
+  <!-- TAB 5 -->
+  <div class="tab-content" id="tab-datos">
+    <div class="table-wrap">
+      <div class="search-wrap"><input type="text" id="search-datos" placeholder="🔍 Buscar en todos los campos..." oninput="filterDatos()"></div>
+      <table>
+        <thead><tr>
+          <th onclick="sortTable('año')">Año ↕</th>
+          <th onclick="sortTable('mes_num')">Mes ↕</th>
+          <th onclick="sortTable('grupo_objetivo')">Grupo Objetivo ↕</th>
+          <th onclick="sortTable('dosis')">Dosis ↕</th>
+          <th onclick="sortTable('origen')">Origen ↕</th>
+          <th>Semana</th>
+          <th onclick="sortTable('fuente')">Fuente ↕</th>
+        </tr></thead>
+        <tbody id="tb-datos"></tbody>
+      </table>
+      <div class="pagination">
+        <div class="page-info" id="page-info"></div>
+        <div class="page-btns" id="page-btns"></div>
+      </div>
+    </div>
+  </div>
 
-    function postLoad(){
-      // meta
-      $('ultima_actualizacion').textContent = DATA.meta.ultima_actualizacion || '--';
-      $('aboutUltima').textContent = DATA.meta.ultima_actualizacion || '--';
-      $('aboutTotal').textContent = DATA.meta.total_registros || (DATA.registros?DATA.registros.length:'--');
-      $('totalRegistros').textContent = DATA.meta.total_registros || (DATA.registros?DATA.registros.length:'0');
+</div>
 
-      // build filters
-      buildFilters();
-      applyFiltersFromStorage();
-      applyFilters();
-    }
+<div id="spinner"><div class="spin"></div></div>
 
-    /***********************
-     * Filtros y persistencia
-     ***********************/
-    function buildFilters(){
-      const years = new Set(), months = new Map(), turnos = new Set();
-      DATA.registros.forEach(r=>{
-        years.add(r.año);
-        months.set(r.mes_num + '|' + r.mes, r.mes);
-        if(r.turno) turnos.add(r.turno);
-      });
-      const fy = $('filterYear'); fy.innerHTML = '<option value="all">Todos</option>';
-      Array.from(years).sort().forEach(y=>{
-        const o = document.createElement('option'); o.value=y; o.textContent=y; fy.appendChild(o);
-      });
-      const fm = $('filterMonth'); fm.innerHTML = '<option value="all">Todos</option>';
-      Array.from(months).sort((a,b)=>Number(a.split('|')[0])-Number(b.split('|')[0])).forEach(k=>{
-        const [num,mes] = k.split('|');
-        const o = document.createElement('option'); o.value=num; o.textContent=mes; fm.appendChild(o);
-      });
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <h2>📥 Importar JSON</h2>
+    <p class="modal-info">Ingrese la contraseña para cargar un archivo JSON local:</p>
+    <input type="password" id="import-pass" placeholder="Contraseña...">
+    <input type="file" id="import-file" accept=".json" style="display:none">
+    <div id="import-err" style="color:var(--red);font-size:12px;margin-bottom:8px"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('import-modal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="verifyImport()">Continuar</button>
+    </div>
+  </div>
+</div>
 
-      if(turnos.size>0){
-        $('turnoFilterLabel').classList.remove('hidden');
-        const ft = $('filterTurno'); ft.innerHTML = '<option value="all">Todos</option>';
-        Array.from(turnos).forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; ft.appendChild(o); });
-      } else {
-        $('turnoFilterLabel').classList.add('hidden');
-      }
+<div class="modal-overlay" id="about-modal">
+  <div class="modal">
+    <h2>ℹ️ Acerca del Dashboard</h2>
+    <div id="about-content" class="modal-info"></div>
+    <div class="modal-btns"><button class="btn btn-primary" onclick="closeModal('about-modal')">Cerrar</button></div>
+  </div>
+</div>
 
-      // top5 periodos
-      const top5Periodo = $('top5Periodo'); top5Periodo.innerHTML = '<option value="all">Todos</option>';
-      const periodSet = new Set();
-      DATA.registros.forEach(r=> periodSet.add(`${r.año}-${String(r.mes_num).padStart(2,'0')}`));
-      Array.from(periodSet).sort().reverse().forEach(p=>{
-        const [a,m]=p.split('-'); const mesName = DATA.registros.find(rr=>rr.año==a && String(rr.mes_num).padStart(2,'0')==m).mes;
-        const o=document.createElement('option'); o.value=p; o.textContent=`${mesName} ${a}`; top5Periodo.appendChild(o);
-      });
+<script>
+const JSON_URL='datos.json';
+const MES_ORDER=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+const COLORS=['#0ea5e9','#10b981','#f59e0b','#a855f7','#ec4899','#ef4444','#06b6d4','#84cc16','#fb923c','#6366f1','#14b8a6','#f43f5e'];
 
-      // comparativa selector (años)
-      const compSel = $('comparativaSelector'); compSel.innerHTML='';
-      Array.from(years).sort().forEach(y=>{
-        const o=document.createElement('option'); o.value=y; o.textContent=y; compSel.appendChild(o);
-      });
-    }
+let APP_DATA=null,registros=[],darkMode=true,datosFiltered=[],datosSortKey='año',datosSortDir=1,currentPage=1;
+const PAGE_SIZE=20;
+let charts={};
 
-    function saveFiltersToStorage(){
-      localStorage.setItem('dashboard_filters', JSON.stringify(state));
-    }
-    function applyFiltersFromStorage(){
-      const s = localStorage.getItem('dashboard_filters');
-      if(s){ try{ const st = JSON.parse(s); Object.assign(state,st); }catch(e){} }
-      // apply to UI
-      $('filterYear').value = state.year || 'all';
-      $('filterMonth').value = state.month || 'all';
-      if($('filterTurno')) $('filterTurno').value = state.turno || 'all';
-      $('globalSearch').value = state.search || '';
-      $('pageSize').value = state.pageSize || 20;
-    }
+window.addEventListener('DOMContentLoaded',()=>{
+  startClock(); loadData();
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+});
 
-    /***********************
-     * Filtrado y búsqueda
-     ***********************/
-    function applyFilters(){
-      const year = $('filterYear').value;
-      const month = $('filterMonth').value;
-      const turno = $('filterTurno')?$('filterTurno').value:'all';
-      const search = $('globalSearch').value.trim().toLowerCase();
+function startClock(){
+  const tick=()=>{
+    const d=new Date();
+    document.getElementById('clock').textContent=d.toLocaleTimeString('es-CL');
+    document.getElementById('dateh').textContent=d.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  };
+  tick();setInterval(tick,1000);
+}
 
-      state.year = year; state.month = month; state.turno = turno; state.search = search;
-      saveFiltersToStorage();
+async function loadData(){
+  showSpinner(true);
+  try{
+    const r=await fetch(JSON_URL);
+    if(!r.ok)throw new Error('fetch failed');
+    APP_DATA=await r.json();
+  }catch(e){
+    APP_DATA={meta:{dashboard_nombre:'Antiinfluenza',area:'Epidemiología',ultima_actualizacion:new Date().toISOString(),total_registros:0,version:'1.0'},registros:[]};
+  }
+  processData();
+  showSpinner(false);
+}
 
-      filtered = DATA.registros.filter(r=>{
-        if(year!=='all' && String(r.año)!==String(year)) return false;
-        if(month!=='all' && String(r.mes_num)!==String(month)) return false;
-        if(turno && turno!=='all' && r.turno!==turno) return false;
-        if(search){
-          const hay = Object.values(r).some(v=> String(v).toLowerCase().includes(search));
-          if(!hay) return false;
-        }
-        return true;
-      });
+function processData(){
+  registros=APP_DATA.registros||[];
+  const ts=APP_DATA.meta?.ultima_actualizacion||'—';
+  document.getElementById('last-update-hdr').textContent='Actualizado: '+ts.replace('T',' ').substring(0,16);
+  populateFilters();
+  renderResumen();renderPeriodo();renderTop5();renderDatos();
+}
 
-      // update UI
-      renderKPIs();
-      renderMonthlyChart();
-      renderDonut();
-      renderTrend();
-      renderPeriodoTable();
-      renderAllTable();
-      renderComparativa();
-      renderTop5();
-    }
+function getVal(id){const s=document.getElementById(id);return s?s.value:'all';}
+function filterReg(anio='all',mes='all',origen='all'){
+  return registros.filter(r=>(anio==='all'||r.año==anio)&&(mes==='all'||r.mes===mes)&&(origen==='all'||r.origen===origen));
+}
+function sumDosis(arr){return arr.reduce((a,r)=>a+r.dosis,0);}
+function fmt(n){return Number(n).toLocaleString('es-CL');}
+function deltaHtml(curr,prev){
+  if(!prev||prev===0)return '<span class="kpi-delta neutral">— sin período ant.</span>';
+  const p=((curr-prev)/prev*100).toFixed(1);
+  const cls=p>=0?'up':'down';
+  return `<span class="kpi-delta ${cls}">${p>=0?'↑':'↓'}${Math.abs(p)}% vs año ant.</span>`;
+}
+function destroyChart(k){if(charts[k]){charts[k].destroy();delete charts[k];}}
+function getCtx(id){return document.getElementById(id)?.getContext('2d');}
+function chartDef(){
+  const c=darkMode?'#e2e8f0':'#1e293b', m=darkMode?'#94a3b8':'#475569', g=darkMode?'rgba(51,65,85,.5)':'rgba(0,0,0,.06)';
+  return{plugins:{legend:{labels:{color:c,font:{family:'Outfit'}}}},scales:{x:{ticks:{color:m,font:{family:'Outfit'}},grid:{color:g}},y:{ticks:{color:m,font:{family:'Outfit'}},grid:{color:g}}},animation:{duration:500},responsive:true,maintainAspectRatio:false};
+}
 
-    /***********************
-     * KPIs
-     ***********************/
-    function computeKPIs(records){
-      const total = records.reduce((s,r)=>s+safeNum(r.cantidad),0);
-      const max = records.reduce((m,r)=>Math.max(m,safeNum(r.cantidad)),0);
-      const avg = records.length? (total/records.length):0;
-      // variation vs previous period (simple: compare to same period previous year for same filters)
-      const currentYear = state.year==='all'?null: Number(state.year);
-      let variation = null;
-      if(currentYear){
-        const prev = DATA.registros.filter(r=>{
-          if(String(r.año)!==String(currentYear-1)) return false;
-          if(state.month!=='all' && String(r.mes_num)!==String(state.month)) return false;
-          return true;
-        });
-        const prevTotal = prev.reduce((s,r)=>s+safeNum(r.cantidad),0);
-        variation = prevTotal? ((total - prevTotal)/prevTotal)*100 : null;
-      }
-      return {total,max,avg,variation};
-    }
+function populateFilters(){
+  const años=[...new Set(registros.map(r=>r.año))].sort();
+  const meses=[...new Set(registros.map(r=>r.mes))].sort((a,b)=>MES_ORDER.indexOf(a)-MES_ORDER.indexOf(b));
+  const origenes=[...new Set(registros.map(r=>r.origen))];
+  function fill(id,vals,withAll=true,def=null){
+    const s=document.getElementById(id);if(!s)return;
+    s.innerHTML='';
+    if(withAll)s.innerHTML='<option value="all">Todos</option>';
+    vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;if(def&&v==def)o.selected=true;s.appendChild(o);});
+  }
+  fill('r-anio',años);fill('r-mes',meses);fill('r-origen',origenes);
+  fill('p-anio',años,false,String(Math.max(...años)));fill('p-mes',meses);
+  const lY=Math.max(...años);
+  fill('cmp-y1',años,false,String(lY));
+  fill('cmp-y2',años,false,String(años[años.length-2]||años[0]));
+  fill('cmp-y3',años,false,'');fill('cmp-y4',años,false,'');fill('cmp-y5',años,false,'');
+  fill('t5-anio',años);fill('t5-mes',meses);
+  ['r-anio','r-mes','r-origen'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderResumen));
+  ['p-anio','p-mes'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderPeriodo));
+  ['t5-anio','t5-mes','t5-n'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderTop5));
+}
 
-    function renderKPIs(){
-      const kpiGrid = $('kpiGrid'); kpiGrid.innerHTML='';
-      const k = computeKPIs(filtered);
-      const items = [
-        {title:'Total', value:k.total, icon:'📦', delta:k.variation},
-        {title:'Máximo', value:k.max, icon:'📈'},
-        {title:'Promedio', value:Math.round(k.avg*100)/100, icon:'⚖️'},
-        {title:'Registros', value:filtered.length, icon:'🧾'},
-        {title:'Área', value:DATA.meta.area || '—', icon:'🏷️'}
-      ];
-      items.forEach(it=>{
-        const div = document.createElement('div'); div.className='kpi';
-        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="muted">${it.title}</div>
-            <div class="value">${it.value}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:20px">${it.icon}</div>
-            <div class="delta">${it.delta===undefined? '' : (it.delta===null?'<span class="muted">sin periodo previo</span>': (it.delta>=0?`<span style="color:var(--accent-green)">▲ ${Math.round(it.delta*100)/100}%</span>`:`<span style="color:var(--accent-red)">▼ ${Math.round(it.delta*100)/100}%</span>`))}</div>
-          </div>
-        </div>`;
-        kpiGrid.appendChild(div);
-      });
-    }
+function renderResumen(){
+  const anio=getVal('r-anio'),mes=getVal('r-mes'),origen=getVal('r-origen');
+  const data=filterReg(anio,mes,origen);
+  const años=[...new Set(registros.map(r=>r.año))].sort();
+  const total=sumDosis(data);
+  const prev=anio==='all'?[]:filterReg(String(parseInt(anio)-1),mes,origen);
+  const totalPrev=sumDosis(prev);
+  const gmap=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const top1=Object.entries(gmap).sort((a,b)=>b[1]-a[1])[0];
+  const nG=new Set(data.map(r=>r.grupo_objetivo)).size;
+  const nM=new Set(data.map(r=>r.mes)).size;
+  const prom=nM>0?Math.round(total/nM):0;
+  document.getElementById('kpi-resumen').innerHTML=`
+    <div class="kpi-card"><div class="kpi-icon">💉</div><div class="kpi-label">Total Dosis</div><div class="kpi-value">${fmt(total)}</div>${deltaHtml(total,totalPrev)}</div>
+    <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Grupos Objetivo</div><div class="kpi-value">${nG}</div><div class="kpi-delta neutral">activos en filtro</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-label">Prom. Mensual</div><div class="kpi-value">${fmt(prom)}</div><div class="kpi-delta neutral">dosis/mes</div></div>
+    <div class="kpi-card"><div class="kpi-icon">🏆</div><div class="kpi-label">Grupo Líder</div><div class="kpi-value" style="font-size:13px;line-height:1.3">${top1?top1[0].substring(0,28):'—'}</div><div class="kpi-delta neutral">${top1?fmt(top1[1])+' dosis':''}</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-label">Registros</div><div class="kpi-value">${fmt(data.length)}</div><div class="kpi-delta neutral">en filtro actual</div></div>
+  `;
+  const mesDosis={};MES_ORDER.forEach(m=>mesDosis[m]=0);
+  data.forEach(r=>{if(mesDosis[r.mes]!==undefined)mesDosis[r.mes]+=r.dosis;});
+  destroyChart('meses');
+  const ctxM=getCtx('c-meses');
+  if(ctxM)charts['meses']=new Chart(ctxM,{type:'bar',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:[{label:'Dosis',data:MES_ORDER.map(m=>mesDosis[m]),backgroundColor:COLORS[0]+'cc',borderColor:COLORS[0],borderWidth:1,borderRadius:4}]},options:chartDef()});
 
-    /***********************
-     * Charts
-     ***********************/
-    function renderMonthlyChart(){
-      const ctx = $('barMonthly').getContext('2d');
-      const year = $('filterYear').value;
-      const months = Array.from({length:12},(_,i)=>i+1);
-      const labels = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-      const counts = months.map(m=>{
-        return DATA.registros.filter(r=>{
-          if(year!=='all' && String(r.año)!==String(year)) return false;
-          return Number(r.mes_num)===m;
-        }).reduce((s,r)=>s+safeNum(r.cantidad),0);
-      });
-      if(charts.barMonthly) charts.barMonthly.destroy();
-      charts.barMonthly = new Chart(ctx,{
-        type:'bar',
-        data:{labels, datasets:[{label:'Cantidad',data:counts,backgroundColor: 'rgba(14,165,233,0.9)'}]},
-        options:{animation:{duration:500},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
-      });
-    }
+  const aDosis=años.map(a=>({a,d:sumDosis(registros.filter(r=>r.año==a))}));
+  destroyChart('anios');
+  const ctxA=getCtx('c-anios');
+  if(ctxA)charts['anios']=new Chart(ctxA,{type:'line',data:{labels:aDosis.map(x=>x.a),datasets:[{label:'Dosis',data:aDosis.map(x=>x.d),borderColor:COLORS[2],backgroundColor:COLORS[2]+'33',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:COLORS[2]}]},options:chartDef()});
 
-    function renderDonut(){
-      const ctx = $('donutCategory').getContext('2d');
-      const map = {};
-      filtered.forEach(r=> map[r.categoria] = (map[r.categoria]||0)+safeNum(r.cantidad));
-      const labels = Object.keys(map).length?Object.keys(map):['Sin categoría'];
-      const data = labels.map(l=>map[l]||0);
-      if(charts.donutCategory) charts.donutCategory.destroy();
-      charts.donutCategory = new Chart(ctx,{
-        type:'doughnut',
-        data:{labels,data: data, datasets:[{backgroundColor:['#0ea5e9','#10b981','#f59e0b','#ef4444','#64748b']}]},
-        options:{animation:{duration:500},plugins:{legend:{position:'bottom'}}}
-      });
-    }
+  const gm=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const t10=Object.entries(gm).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  destroyChart('dona');
+  const ctxD=getCtx('c-dona');
+  if(ctxD)charts['dona']=new Chart(ctxD,{type:'doughnut',data:{labels:t10.map(x=>x[0].substring(0,22)),datasets:[{data:t10.map(x=>x[1]),backgroundColor:COLORS.map(c=>c+'cc'),borderColor:COLORS,borderWidth:1}]},options:{...chartDef(),cutout:'55%',plugins:{legend:{position:'right',labels:{color:darkMode?'#e2e8f0':'#1e293b',font:{family:'Outfit',size:10},boxWidth:12}}}}});
 
-    function renderTrend(){
-      const ctx = $('lineTrend').getContext('2d');
-      // trend: monthly totals across last 12 months
-      const months = [];
-      const now = new Date();
-      for(let i=11;i>=0;i--){
-        const d = new Date(now.getFullYear(), now.getMonth()-i,1);
-        months.push({año:d.getFullYear(), mes_num:d.getMonth()+1, label: d.toLocaleString('es-CL',{month:'short',year:'numeric'})});
-      }
-      const data = months.map(m=>{
-        return DATA.registros.filter(r=> r.año==m.año && Number(r.mes_num)===m.mes_num).reduce((s,r)=>s+safeNum(r.cantidad),0);
-      });
-      if(charts.lineTrend) charts.lineTrend.destroy();
-      charts.lineTrend = new Chart(ctx,{
-        type:'line',
-        data:{labels:months.map(m=>m.label),datasets:[{label:'Tendencia',data:data,borderColor:getComputedStyle(document.body).getPropertyValue('--accent-green'),tension:0.3,fill:false}]},
-        options:{animation:{duration:500}}
-      });
-    }
+  const last4=años.slice(-4);
+  destroyChart('comp4');
+  const ctxC4=getCtx('c-comp4');
+  if(ctxC4)charts['comp4']=new Chart(ctxC4,{type:'line',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:last4.map((a,i)=>({label:String(a),data:MES_ORDER.map(m=>sumDosis(registros.filter(r=>r.año==a&&r.mes==m))),borderColor:COLORS[i],backgroundColor:COLORS[i]+'33',fill:false,tension:.3,pointRadius:3}))},options:chartDef()});
+}
 
-    /***********************
-     * Tab switching and UI events
-     ***********************/
-    document.querySelectorAll('#tabs .tab').forEach(t=>{
-      t.addEventListener('click',()=>{
-        document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
-        const tab = t.dataset.tab;
-        document.querySelectorAll('.tab-content').forEach(s=>s.classList.add('hidden'));
-        document.getElementById(tab).classList.remove('hidden');
-      });
-    });
+function renderPeriodo(){
+  const anio=getVal('p-anio'),mes=getVal('p-mes');
+  const data=filterReg(anio,mes);
+  const prev=filterReg(String(parseInt(anio)-1),mes);
+  const total=sumDosis(data),totalPrev=sumDosis(prev);
+  const gmap=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const top1=Object.entries(gmap).sort((a,b)=>b[1]-a[1])[0];
+  const nG=new Set(data.map(r=>r.grupo_objetivo)).size;
+  document.getElementById('kpi-periodo').innerHTML=`
+    <div class="kpi-card"><div class="kpi-icon">💉</div><div class="kpi-label">Dosis ${anio}</div><div class="kpi-value">${fmt(total)}</div>${deltaHtml(total,totalPrev)}</div>
+    <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-label">Año Anterior ${parseInt(anio)-1}</div><div class="kpi-value">${fmt(totalPrev)}</div><div class="kpi-delta neutral">referencia</div></div>
+    <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Grupos Activos</div><div class="kpi-value">${nG}</div><div class="kpi-delta neutral">en período</div></div>
+    <div class="kpi-card"><div class="kpi-icon">🎯</div><div class="kpi-label">Grupo Principal</div><div class="kpi-value" style="font-size:13px">${top1?top1[0].substring(0,25):'-'}</div><div class="kpi-delta neutral">${top1?fmt(top1[1])+' dosis':''}</div></div>
+  `;
+  const topG=Object.entries(gmap).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  destroyChart('pgrupo');
+  const ctxG=getCtx('c-pgrupo');
+  if(ctxG)charts['pgrupo']=new Chart(ctxG,{type:'bar',data:{labels:topG.map(x=>x[0].substring(0,20)),datasets:[{label:'Dosis',data:topG.map(x=>x[1]),backgroundColor:COLORS.map(c=>c+'cc'),borderColor:COLORS,borderWidth:1,borderRadius:3}]},options:{...chartDef(),indexAxis:'y',plugins:{legend:{display:false}}}});
 
-    // Import JSON modal
-    document.getElementById('importJsonBtn').addEventListener('click',()=> document.getElementById('importModal').classList.remove('hidden'));
-    document.getElementById('importCancel').addEventListener('click',()=> document.getElementById('importModal').classList.add('hidden'));
-    document.getElementById('importConfirm').addEventListener('click',()=>{
-      const pwd = document.getElementById('importPassword').value;
-      const fileInput = document.getElementById('importFile');
-      if(pwd !== IMPORT_KEY){ document.getElementById('importMsg').textContent = 'Clave incorrecta'; return; }
-      if(!fileInput.files.length){ document.getElementById('importMsg').textContent = 'Seleccione un archivo .json'; return; }
-      const f = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = e => {
-        try{
-          const j = JSON.parse(e.target.result);
-          DATA = j;
-          postLoad();
-          document.getElementById('importModal').classList.add('hidden');
-          document.getElementById('importMsg').textContent = '';
-          document.getElementById('status') && (document.getElementById('status').textContent = 'Datos importados localmente');
-        }catch(err){ document.getElementById('importMsg').textContent = 'JSON inválido'; }
-      };
-      reader.readAsText(f);
-    });
+  destroyChart('pmensual');
+  const ctxM2=getCtx('c-pmensual');
+  if(ctxM2)charts['pmensual']=new Chart(ctxM2,{type:'bar',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:[{label:anio,data:MES_ORDER.map(m=>sumDosis(filterReg(anio,m))),backgroundColor:COLORS[0]+'cc',borderColor:COLORS[0],borderRadius:4},{label:String(parseInt(anio)-1),data:MES_ORDER.map(m=>sumDosis(filterReg(String(parseInt(anio)-1),m))),backgroundColor:COLORS[1]+'cc',borderColor:COLORS[1],borderRadius:4}]},options:chartDef()});
 
-    // Refresh button
-    document.getElementById('refreshBtn').addEventListener('click', loadRemoteJSON);
+  const rows=data.reduce((a,r)=>{const k=r.grupo_objetivo+'|'+r.mes;if(!a[k])a[k]={grupo:r.grupo_objetivo,mes:r.mes,dosis:0};a[k].dosis+=r.dosis;return a},{});
+  const sorted=Object.values(rows).sort((a,b)=>b.dosis-a.dosis);
+  document.getElementById('tb-periodo').innerHTML=sorted.map(x=>`<tr><td>${x.grupo}</td><td><span class="badge badge-blue">${x.mes}</span></td><td><strong>${fmt(x.dosis)}</strong></td><td>${total>0?(x.dosis/total*100).toFixed(1)+'%':'—'}</td></tr>`).join('');
+}
 
-    // Export Excel
-    document.getElementById('exportExcel').addEventListener('click',()=>{
-      const dataToExport = filtered.length ? filtered : (DATA ? DATA.registros : []);
-      if(!dataToExport.length){ alert('No hay datos para exportar'); return; }
-      const ws = XLSX.utils.json_to_sheet(dataToExport);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb,ws,'Datos');
-      const today = new Date().toISOString().slice(0,10);
-      XLSX.writeFile(wb,`datos_export_${today}.xlsx`);
-    });
+function renderComparativa(){
+  const años=['cmp-y1','cmp-y2','cmp-y3','cmp-y4','cmp-y5'].map(id=>getVal(id)).filter(v=>v&&v!==''&&v!=='all').map(Number);
+  const uniq=[...new Set(años)].sort();
+  if(uniq.length<2){document.getElementById('kpi-cmp').innerHTML='<div style="color:var(--text-muted);padding:20px">Selecciona al menos 2 años</div>';return;}
+  const totales=uniq.map(a=>sumDosis(registros.filter(r=>r.año==a)));
+  const max=Math.max(...totales),min=Math.min(...totales);
+  const mejor=uniq[totales.indexOf(max)],peor=uniq[totales.indexOf(min)];
+  const prom=totales.reduce((a,b)=>a+b,0)/totales.length;
+  document.getElementById('kpi-cmp').innerHTML=uniq.map((a,i)=>`<div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-label">Año ${a}</div><div class="kpi-value">${fmt(totales[i])}</div>${i>0?deltaHtml(totales[i],totales[i-1]):'<div class="kpi-delta neutral">base</div>'}</div>`).join('')+
+  `<div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-label">Promedio</div><div class="kpi-value">${fmt(Math.round(prom))}</div><div class="kpi-delta neutral">dosis/año</div></div>
+   <div class="kpi-card"><div class="kpi-icon">🏆</div><div class="kpi-label">Mejor Año</div><div class="kpi-value">${mejor}</div><div class="kpi-delta up">máximo: ${fmt(max)}</div></div>
+   <div class="kpi-card"><div class="kpi-icon">📉</div><div class="kpi-label">Menor Año</div><div class="kpi-value">${peor}</div><div class="kpi-delta down">mínimo: ${fmt(min)}</div></div>`;
 
-    // Print current tab
-    document.getElementById('printTab').addEventListener('click', ()=> window.print());
+  destroyChart('cmp-mes');
+  const ctxCM=getCtx('c-cmp-mes');
+  if(ctxCM)charts['cmp-mes']=new Chart(ctxCM,{type:'line',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:uniq.map((a,i)=>({label:String(a),data:MES_ORDER.map(m=>sumDosis(registros.filter(r=>r.año==a&&r.mes==m))),borderColor:COLORS[i],backgroundColor:COLORS[i]+'44',fill:false,tension:.3,pointRadius:4}))},options:chartDef()});
 
-    // About modal
-    document.getElementById('aboutBtn').addEventListener('click', ()=> document.getElementById('aboutModal').classList.remove('hidden'));
-    document.getElementById('aboutClose').addEventListener('click', ()=> document.getElementById('aboutModal').classList.add('hidden'));
+  document.getElementById('th-cmp').innerHTML='<tr><th>Mes</th>'+uniq.map(a=>`<th>${a}</th>`).join('')+'</tr>';
+  document.getElementById('tb-cmp').innerHTML=MES_ORDER.map(m=>{
+    const vals=uniq.map(a=>sumDosis(registros.filter(r=>r.año==a&&r.mes==m)));
+    const mxV=Math.max(...vals);
+    return `<tr><td><strong>${m}</strong></td>${vals.map((v,i)=>`<td style="${v===mxV&&mxV>0?'color:var(--green);font-weight:700':''}">${fmt(v)}</td>`).join('')}</tr>`;
+  }).join('')+`<tr style="background:var(--bg-card2)"><td><strong>TOTAL</strong></td>${uniq.map(a=>`<td><strong>${fmt(sumDosis(registros.filter(r=>r.año==a)))}</strong></td>`).join('')}</tr>`;
+}
 
-    // Filters
-    document.getElementById('filterYear').addEventListener('change', applyFilters);
-    document.getElementById('filterMonth').addEventListener('change', applyFilters);
-    document.getElementById('filterTurno') && document.getElementById('filterTurno').addEventListener('change', applyFilters);
-    document.getElementById('globalSearch').addEventListener('input', applyFilters);
+function renderTop5(){
+  const anio=getVal('t5-anio'),mes=getVal('t5-mes'),n=parseInt(getVal('t5-n'));
+  const data=filterReg(anio,mes);
+  const total=sumDosis(data);
+  const gmap=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const sorted=Object.entries(gmap).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const maxD=sorted[0]?sorted[0][1]:1;
+  const rankColors=['#f59e0b','#94a3b8','#cd7f32','#10b981','#0ea5e9','#a855f7','#ec4899','#ef4444','#06b6d4','#84cc16','#14b8a6','#f43f5e','#fb923c','#6366f1','#22d3ee'];
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('ranking-list').innerHTML=sorted.map(([g,d],i)=>`<div class="rank-item">
+    <div class="rank-num" style="background:${rankColors[i]}22;color:${rankColors[i]}">${medals[i]||'#'+(i+1)}</div>
+    <div class="rank-bar-wrap"><div class="rank-name">${g}</div><div class="rank-bar"><div class="rank-bar-fill" style="width:${(d/maxD*100).toFixed(1)}%;background:${rankColors[i]}"></div></div></div>
+    <div class="rank-stats"><strong>${fmt(d)}</strong><br>${total>0?(d/total*100).toFixed(1)+'%':'—'}</div>
+  </div>`).join('');
 
-    // Initial load
-    (function init(){
-      // try local datos.json first
-      fetch('datos.json?_=' + Date.now()).then(r=>{ if(r.ok) return r.json(); throw new Error('no local'); }).then(j=>{
-        DATA = j; postLoad();
-      }).catch(()=> loadRemoteJSON());
-      startClock();
-    })();
-  </script>
+  destroyChart('top5');
+  const ctxT=getCtx('c-top5');
+  if(ctxT)charts['top5']=new Chart(ctxT,{type:'bar',data:{labels:sorted.map(([g])=>g.substring(0,20)),datasets:[{label:'Dosis',data:sorted.map(([,d])=>d),backgroundColor:rankColors.slice(0,n).map(c=>c+'cc'),borderColor:rankColors.slice(0,n),borderWidth:1,borderRadius:4}]},options:{...chartDef(),indexAxis:'y',plugins:{legend:{display:false}}}});
+
+  const dataPrev=filterReg(anio==='all'?'all':String(parseInt(anio)-1),mes);
+  const gmapPrev=dataPrev.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  document.getElementById('tb-top5').innerHTML=sorted.map(([g,d],i)=>{
+    const prev=gmapPrev[g]||0;
+    const v=prev>0?((d-prev)/prev*100).toFixed(1):null;
+    return `<tr><td><strong>${i+1}</strong></td><td>${g}</td><td><strong>${fmt(d)}</strong></td><td>${total>0?(d/total*100).toFixed(1)+'%':'—'}</td><td>${v!==null?`<span style="color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'↑':'↓'}${Math.abs(v)}%</span>`:'—'}</td></tr>`;
+  }).join('');
+}
+
+function renderDatos(){datosFiltered=[...registros];currentPage=1;renderDatosTable();}
+function filterDatos(){
+  const q=document.getElementById('search-datos').value.toLowerCase();
+  datosFiltered=q?registros.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))):[...registros];
+  currentPage=1;renderDatosTable();
+}
+function sortTable(key){
+  if(datosSortKey===key)datosSortDir*=-1;else{datosSortKey=key;datosSortDir=1;}
+  datosFiltered.sort((a,b)=>{const av=a[key]??'',bv=b[key]??'';return typeof av==='number'?(av-bv)*datosSortDir:String(av).localeCompare(String(bv))*datosSortDir;});
+  renderDatosTable();
+}
+function renderDatosTable(){
+  const total=datosFiltered.length,totalPages=Math.ceil(total/PAGE_SIZE);
+  const start=(currentPage-1)*PAGE_SIZE;
+  const page=datosFiltered.slice(start,start+PAGE_SIZE);
+  document.getElementById('tb-datos').innerHTML=page.map(r=>`<tr>
+    <td>${r.año}</td><td><span class="badge badge-blue">${r.mes}</span></td>
+    <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.grupo_objetivo}</td>
+    <td><strong>${fmt(r.dosis)}</strong></td><td>${r.origen}</td><td>${r.semana||'—'}</td>
+    <td><span class="badge ${r.fuente==='HISTORICO'?'badge-green':'badge-amber'}">${r.fuente}</span></td>
+  </tr>`).join('')||'<tr><td colspan="7" class="no-data">Sin resultados</td></tr>';
+  document.getElementById('page-info').textContent=`Mostrando ${start+1}–${Math.min(start+PAGE_SIZE,total)} de ${fmt(total)}`;
+  const btns=document.getElementById('page-btns');btns.innerHTML='';
+  const addBtn=(l,p,c='')=>{const b=document.createElement('button');b.className='page-btn '+c;b.textContent=l;b.onclick=()=>{currentPage=p;renderDatosTable();};btns.appendChild(b);};
+  if(currentPage>1)addBtn('‹',currentPage-1);
+  for(let i=Math.max(1,currentPage-2);i<=Math.min(totalPages,currentPage+2);i++)addBtn(i,i,i===currentPage?'active':'');
+  if(currentPage<totalPages)addBtn('›',currentPage+1);
+}
+
+function exportExcel(){
+  const ws=XLSX.utils.json_to_sheet(registros);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Datos');
+  XLSX.writeFile(wb,`influenza_export_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+function openImportModal(){document.getElementById('import-modal').classList.add('open');}
+function verifyImport(){
+  if(document.getElementById('import-pass').value!=='Zoe2023@'){document.getElementById('import-err').textContent='❌ Contraseña incorrecta';return;}
+  document.getElementById('import-err').textContent='';
+  const fi=document.getElementById('import-file');fi.click();
+  fi.onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>{try{APP_DATA=JSON.parse(ev.target.result);processData();closeModal('import-modal');document.getElementById('import-pass').value='';}catch{document.getElementById('import-err').textContent='❌ JSON inválido';}};rd.readAsText(f);};
+}
+async function refreshData(){await loadData();}
+function openAbout(){
+  const m=APP_DATA?.meta||{};
+  document.getElementById('about-content').innerHTML=`<b>Sistema:</b> ${m.dashboard_nombre||'—'}<br><b>Área:</b> ${m.area||'—'}<br><b>Versión:</b> ${m.version||'1.0'}<br><b>Registros:</b> ${fmt(registros.length)}<br><b>Actualizado:</b> ${(m.ultima_actualizacion||'—').replace('T',' ')}<br><br><b>Autor:</b> Rodrigo Villalobos R.<br><b>Mail:</b> <a href="mailto:rodrigovillalobos1978@gmail.com" style="color:var(--accent)">rodrigovillalobos1978@gmail.com</a>`;
+  document.getElementById('about-modal').classList.add('open');
+}
+function toggleTheme(){darkMode=!darkMode;document.body.classList.toggle('light',!darkMode);document.getElementById('themeBtn').textContent=darkMode?'☀️ Modo Claro':'🌙 Modo Oscuro';renderResumen();renderPeriodo();if(document.getElementById('tab-comparativa').classList.contains('active'))renderComparativa();renderTop5();}
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.toggle('active',t.id==='tab-'+name));
+  if(name==='comparativa')renderComparativa();
+  if(name==='top5')renderTop5();
+  if(name==='datos')renderDatos();
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showSpinner(v){document.getElementById('spinner').classList.toggle('show',v);}
+</script>
 </body>
 </html>
