@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Vacunación Antiinfluenza</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg-main:#0f172a;--bg-card:#1e293b;--bg-card2:#162032;--border:#334155;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#0ea5e9;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#a855f7;--pink:#ec4899;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4)}
+.light{--bg-main:#f1f5f9;--bg-card:#ffffff;--bg-card2:#f8fafc;--border:#e2e8f0;--text:#1e293b;--text-muted:#64748b;--shadow:0 2px 12px rgba(0,0,0,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg-main);color:var(--text);min-height:100vh;font-size:14px}
+#header{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+.light #header{background:linear-gradient(135deg,#1e40af 0%,#3b82f6 50%,#1e40af 100%)}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-logo{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.header-title h1{font-size:17px;font-weight:700;color:#fff;letter-spacing:.3px}
+.header-title p{font-size:11px;color:#93c5fd;margin-top:1px}
+.header-center{display:flex;flex-direction:column;align-items:center;gap:2px}
+#clock{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:2px}
+#dateh{font-size:11px;color:#93c5fd}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.author-info{font-size:11px;color:#93c5fd;text-align:right}
+.author-info a{color:#60a5fa;text-decoration:none}
+.author-info a:hover{text-decoration:underline}
+#toolbar{background:var(--bg-card);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.2s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#0284c7}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#059669}
+.btn-warning{background:var(--amber);color:#fff}.btn-warning:hover{background:#d97706}
+.btn-info{background:var(--purple);color:#fff}.btn-info:hover{background:#9333ea}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}.btn-ghost:hover{background:var(--border);color:var(--text)}
+.btn-toggle{background:var(--bg-card2);color:var(--text);border:1px solid var(--border)}.btn-toggle:hover{background:var(--border)}
+#tabs{background:var(--bg-card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+.tab{padding:12px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;color:var(--text-muted);transition:.2s;white-space:nowrap}
+.tab:hover{color:var(--text);background:var(--bg-card2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+#main{padding:20px;max-width:1600px;margin:0 auto}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.filter-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-bar label{font-size:12px;font-weight:600;color:var(--text-muted)}
+select,input[type=text]{background:var(--bg-card2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:7px;font-family:inherit;font-size:13px;cursor:pointer}
+select:focus,input[type=text]:focus{outline:none;border-color:var(--accent)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;transition:.2s;cursor:default}
+.kpi-card:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(14,165,233,.2);transform:translateY(-2px)}
+.kpi-icon{font-size:22px;margin-bottom:8px}
+.kpi-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-value{font-size:26px;font-weight:700;color:var(--text)}
+.kpi-delta{font-size:12px;margin-top:4px;font-weight:600}
+.kpi-delta.up{color:var(--green)}.kpi-delta.down{color:var(--red)}.kpi-delta.neutral{color:var(--text-muted)}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px;margin-bottom:20px}
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.chart-card h3{font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.chart-wrap{position:relative;height:220px}
+.chart-wrap-lg{position:relative;height:280px}
+.table-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
+.table-wrap table{width:100%;border-collapse:collapse}
+.table-wrap th{background:var(--bg-card2);color:var(--text-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+.table-wrap th:hover{color:var(--accent)}
+.table-wrap td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.table-wrap tr:last-child td{border-bottom:none}
+.table-wrap tr:hover td{background:var(--bg-card2)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-blue{background:rgba(14,165,233,.15);color:var(--accent)}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.rank-item{background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.rank-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.rank-bar-wrap{flex:1}
+.rank-name{font-size:13px;font-weight:600;margin-bottom:5px}
+.rank-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.rank-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.rank-stats{text-align:right;font-size:12px;color:var(--text-muted);min-width:90px}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border)}
+.page-info{font-size:12px;color:var(--text-muted)}
+.page-btns{display:flex;gap:5px}
+.page-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card2);color:var(--text-muted);cursor:pointer;font-size:12px}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page-btn:hover:not(.active){background:var(--border);color:var(--text)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:440px;box-shadow:var(--shadow)}
+.modal h2{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--accent)}
+.modal input{width:100%;background:var(--bg-card2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:12px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.modal-info{font-size:13px;color:var(--text-muted);margin-bottom:10px;line-height:1.6}
+#spinner{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
+#spinner.show{display:flex}
+.spin{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';display:block;width:4px;height:18px;background:var(--accent);border-radius:2px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.search-wrap{padding:10px 14px;border-bottom:1px solid var(--border)}
+.search-wrap input{width:100%;background:var(--bg-card2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-family:inherit;font-size:13px}
+.no-data{padding:40px;text-align:center;color:var(--text-muted)}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}.charts-grid{grid-template-columns:1fr}}
+@media print{#header,#toolbar,#tabs,.filter-bar,.btn,#spinner{display:none!important}.tab-content{display:none!important}.tab-content.active{display:block!important}body{background:#fff}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="header-left">
+    <div class="header-logo">💉</div>
+    <div class="header-title">
+      <h1>Dashboard — Campaña Antiinfluenza</h1>
+      <p>Epidemiología · Salud Pública · Región Ñuble</p>
+    </div>
+  </div>
+  <div class="header-center">
+    <div id="clock">--:--:--</div>
+    <div id="dateh">--</div>
+  </div>
+  <div class="header-right">
+    <div class="author-info">Autor: <strong>Rodrigo Villalobos R.</strong></div>
+    <div class="author-info">Mail: <a href="mailto:rodrigovillalobos1978@gmail.com">rodrigovillalobos1978@gmail.com</a></div>
+    <div class="author-info" id="last-update-hdr">Última actualización: —</div>
+  </div>
+</div>
+
+<div id="toolbar">
+  <button class="btn btn-success" onclick="exportExcel()">📤 Exportar Excel</button>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
+  <button class="btn btn-warning" onclick="openImportModal()">📥 Importar JSON</button>
+  <button class="btn btn-info" onclick="refreshData()">🔄 Actualizar</button>
+  <button class="btn btn-ghost" onclick="openAbout()">ℹ️ Acerca de</button>
+  <button class="btn btn-toggle" id="themeBtn" onclick="toggleTheme()">☀️ Modo Claro</button>
+</div>
+
+<div id="tabs">
+  <div class="tab active" data-tab="resumen">📊 Resumen General</div>
+  <div class="tab" data-tab="periodo">📅 Por Período</div>
+  <div class="tab" data-tab="comparativa">📈 Comparativa</div>
+  <div class="tab" data-tab="top5">🏆 Top Grupos</div>
+  <div class="tab" data-tab="datos">🗃️ Datos Completos</div>
+</div>
+
+<div id="main">
+
+  <!-- TAB 1 -->
+  <div class="tab-content active" id="tab-resumen">
+    <div class="filter-bar">
+      <label>Año:</label><select id="r-anio"><option value="all">Todos</option></select>
+      <label>Mes:</label><select id="r-mes"><option value="all">Todos</option></select>
+      <label>Origen:</label><select id="r-origen"><option value="all">Todos</option></select>
+    </div>
+    <div class="kpi-grid" id="kpi-resumen"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><h3>📊 Dosis por Mes</h3><div class="chart-wrap"><canvas id="c-meses"></canvas></div></div>
+      <div class="chart-card"><h3>📈 Tendencia Histórica por Año</h3><div class="chart-wrap"><canvas id="c-anios"></canvas></div></div>
+      <div class="chart-card"><h3>🍩 Top 10 Grupos Objetivo</h3><div class="chart-wrap"><canvas id="c-dona"></canvas></div></div>
+      <div class="chart-card"><h3>📉 Comparativa Últimos 4 Años</h3><div class="chart-wrap"><canvas id="c-comp4"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div class="tab-content" id="tab-periodo">
+    <div class="filter-bar">
+      <label>Año:</label><select id="p-anio"></select>
+      <label>Mes:</label><select id="p-mes"><option value="all">Todos</option></select>
+    </div>
+    <div class="kpi-grid" id="kpi-periodo"></div>
+    <div class="two-col">
+      <div class="chart-card"><h3>📊 Dosis por Grupo Objetivo</h3><div class="chart-wrap-lg"><canvas id="c-pgrupo"></canvas></div></div>
+      <div class="chart-card"><h3>📅 Evolución Mensual del Año</h3><div class="chart-wrap-lg"><canvas id="c-pmensual"></canvas></div></div>
+    </div>
+    <div class="section-title">Detalle por Grupo</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Grupo Objetivo</th><th>Mes</th><th>Dosis</th><th>% del Total</th></tr></thead>
+      <tbody id="tb-periodo"></tbody>
+    </table></div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div class="tab-content" id="tab-comparativa">
+    <div class="filter-bar">
+      <label>Años (2–5):</label>
+      <select id="cmp-y1"></select>
+      <select id="cmp-y2"></select>
+      <select id="cmp-y3"><option value="">—</option></select>
+      <select id="cmp-y4"><option value="">—</option></select>
+      <select id="cmp-y5"><option value="">—</option></select>
+      <button class="btn btn-primary" onclick="renderComparativa()">Comparar</button>
+    </div>
+    <div class="kpi-grid" id="kpi-cmp"></div>
+    <div class="chart-card" style="margin-bottom:16px"><h3>📊 Dosis Mensuales por Año</h3><div class="chart-wrap-lg"><canvas id="c-cmp-mes"></canvas></div></div>
+    <div class="section-title">Tabla Comparativa por Mes</div>
+    <div class="table-wrap"><table><thead id="th-cmp"></thead><tbody id="tb-cmp"></tbody></table></div>
+  </div>
+
+  <!-- TAB 4 -->
+  <div class="tab-content" id="tab-top5">
+    <div class="filter-bar">
+      <label>Año:</label><select id="t5-anio"><option value="all">Todos</option></select>
+      <label>Mes:</label><select id="t5-mes"><option value="all">Todos</option></select>
+      <label>Top:</label>
+      <select id="t5-n"><option value="5">Top 5</option><option value="10">Top 10</option><option value="15">Top 15</option></select>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="section-title">🏆 Ranking por Dosis</div>
+        <div id="ranking-list"></div>
+      </div>
+      <div class="chart-card"><h3>📊 Distribución Visual</h3><div class="chart-wrap-lg"><canvas id="c-top5"></canvas></div></div>
+    </div>
+    <div class="section-title">Tabla Detallada</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Grupo Objetivo</th><th>Dosis</th><th>% Total</th><th>Var. vs Año Ant.</th></tr></thead>
+      <tbody id="tb-top5"></tbody>
+    </table></div>
+  </div>
+
+  <!-- TAB 5 -->
+  <div class="tab-content" id="tab-datos">
+    <div class="table-wrap">
+      <div class="search-wrap"><input type="text" id="search-datos" placeholder="🔍 Buscar en todos los campos..." oninput="filterDatos()"></div>
+      <table>
+        <thead><tr>
+          <th onclick="sortTable('año')">Año ↕</th>
+          <th onclick="sortTable('mes_num')">Mes ↕</th>
+          <th onclick="sortTable('grupo_objetivo')">Grupo Objetivo ↕</th>
+          <th onclick="sortTable('dosis')">Dosis ↕</th>
+          <th onclick="sortTable('origen')">Origen ↕</th>
+          <th>Semana</th>
+          <th onclick="sortTable('fuente')">Fuente ↕</th>
+        </tr></thead>
+        <tbody id="tb-datos"></tbody>
+      </table>
+      <div class="pagination">
+        <div class="page-info" id="page-info"></div>
+        <div class="page-btns" id="page-btns"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="spinner"><div class="spin"></div></div>
+
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <h2>📥 Importar JSON</h2>
+    <p class="modal-info">Ingrese la contraseña para cargar un archivo JSON local:</p>
+    <input type="password" id="import-pass" placeholder="Contraseña...">
+    <input type="file" id="import-file" accept=".json" style="display:none">
+    <div id="import-err" style="color:var(--red);font-size:12px;margin-bottom:8px"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('import-modal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="verifyImport()">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="about-modal">
+  <div class="modal">
+    <h2>ℹ️ Acerca del Dashboard</h2>
+    <div id="about-content" class="modal-info"></div>
+    <div class="modal-btns"><button class="btn btn-primary" onclick="closeModal('about-modal')">Cerrar</button></div>
+  </div>
+</div>
+
+<script>
+const JSON_URL='datos.json';
+const MES_ORDER=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+const COLORS=['#0ea5e9','#10b981','#f59e0b','#a855f7','#ec4899','#ef4444','#06b6d4','#84cc16','#fb923c','#6366f1','#14b8a6','#f43f5e'];
+
+let APP_DATA=null,registros=[],darkMode=true,datosFiltered=[],datosSortKey='año',datosSortDir=1,currentPage=1;
+const PAGE_SIZE=20;
+let charts={};
+
+window.addEventListener('DOMContentLoaded',()=>{
+  startClock(); loadData();
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+});
+
+function startClock(){
+  const tick=()=>{
+    const d=new Date();
+    document.getElementById('clock').textContent=d.toLocaleTimeString('es-CL');
+    document.getElementById('dateh').textContent=d.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  };
+  tick();setInterval(tick,1000);
+}
+
+async function loadData(){
+  showSpinner(true);
+  try{
+    const r=await fetch(JSON_URL);
+    if(!r.ok)throw new Error('fetch failed');
+    APP_DATA=await r.json();
+  }catch(e){
+    APP_DATA={meta:{dashboard_nombre:'Antiinfluenza',area:'Epidemiología',ultima_actualizacion:new Date().toISOString(),total_registros:0,version:'1.0'},registros:[]};
+  }
+  processData();
+  showSpinner(false);
+}
+
+function processData(){
+  registros=APP_DATA.registros||[];
+  const ts=APP_DATA.meta?.ultima_actualizacion||'—';
+  document.getElementById('last-update-hdr').textContent='Actualizado: '+ts.replace('T',' ').substring(0,16);
+  populateFilters();
+  renderResumen();renderPeriodo();renderTop5();renderDatos();
+}
+
+function getVal(id){const s=document.getElementById(id);return s?s.value:'all';}
+function filterReg(anio='all',mes='all',origen='all'){
+  return registros.filter(r=>(anio==='all'||r.año==anio)&&(mes==='all'||r.mes===mes)&&(origen==='all'||r.origen===origen));
+}
+function sumDosis(arr){return arr.reduce((a,r)=>a+r.dosis,0);}
+function fmt(n){return Number(n).toLocaleString('es-CL');}
+function deltaHtml(curr,prev){
+  if(!prev||prev===0)return '<span class="kpi-delta neutral">— sin período ant.</span>';
+  const p=((curr-prev)/prev*100).toFixed(1);
+  const cls=p>=0?'up':'down';
+  return `<span class="kpi-delta ${cls}">${p>=0?'↑':'↓'}${Math.abs(p)}% vs año ant.</span>`;
+}
+function destroyChart(k){if(charts[k]){charts[k].destroy();delete charts[k];}}
+function getCtx(id){return document.getElementById(id)?.getContext('2d');}
+function chartDef(){
+  const c=darkMode?'#e2e8f0':'#1e293b', m=darkMode?'#94a3b8':'#475569', g=darkMode?'rgba(51,65,85,.5)':'rgba(0,0,0,.06)';
+  return{plugins:{legend:{labels:{color:c,font:{family:'Outfit'}}}},scales:{x:{ticks:{color:m,font:{family:'Outfit'}},grid:{color:g}},y:{ticks:{color:m,font:{family:'Outfit'}},grid:{color:g}}},animation:{duration:500},responsive:true,maintainAspectRatio:false};
+}
+
+function populateFilters(){
+  const años=[...new Set(registros.map(r=>r.año))].sort();
+  const meses=[...new Set(registros.map(r=>r.mes))].sort((a,b)=>MES_ORDER.indexOf(a)-MES_ORDER.indexOf(b));
+  const origenes=[...new Set(registros.map(r=>r.origen))];
+  function fill(id,vals,withAll=true,def=null){
+    const s=document.getElementById(id);if(!s)return;
+    s.innerHTML='';
+    if(withAll)s.innerHTML='<option value="all">Todos</option>';
+    vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;if(def&&v==def)o.selected=true;s.appendChild(o);});
+  }
+  fill('r-anio',años);fill('r-mes',meses);fill('r-origen',origenes);
+  fill('p-anio',años,false,String(Math.max(...años)));fill('p-mes',meses);
+  const lY=Math.max(...años);
+  fill('cmp-y1',años,false,String(lY));
+  fill('cmp-y2',años,false,String(años[años.length-2]||años[0]));
+  fill('cmp-y3',años,false,'');fill('cmp-y4',años,false,'');fill('cmp-y5',años,false,'');
+  fill('t5-anio',años);fill('t5-mes',meses);
+  ['r-anio','r-mes','r-origen'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderResumen));
+  ['p-anio','p-mes'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderPeriodo));
+  ['t5-anio','t5-mes','t5-n'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderTop5));
+}
+
+function renderResumen(){
+  const anio=getVal('r-anio'),mes=getVal('r-mes'),origen=getVal('r-origen');
+  const data=filterReg(anio,mes,origen);
+  const años=[...new Set(registros.map(r=>r.año))].sort();
+  const total=sumDosis(data);
+  const prev=anio==='all'?[]:filterReg(String(parseInt(anio)-1),mes,origen);
+  const totalPrev=sumDosis(prev);
+  const gmap=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const top1=Object.entries(gmap).sort((a,b)=>b[1]-a[1])[0];
+  const nG=new Set(data.map(r=>r.grupo_objetivo)).size;
+  const nM=new Set(data.map(r=>r.mes)).size;
+  const prom=nM>0?Math.round(total/nM):0;
+  document.getElementById('kpi-resumen').innerHTML=`
+    <div class="kpi-card"><div class="kpi-icon">💉</div><div class="kpi-label">Total Dosis</div><div class="kpi-value">${fmt(total)}</div>${deltaHtml(total,totalPrev)}</div>
+    <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Grupos Objetivo</div><div class="kpi-value">${nG}</div><div class="kpi-delta neutral">activos en filtro</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-label">Prom. Mensual</div><div class="kpi-value">${fmt(prom)}</div><div class="kpi-delta neutral">dosis/mes</div></div>
+    <div class="kpi-card"><div class="kpi-icon">🏆</div><div class="kpi-label">Grupo Líder</div><div class="kpi-value" style="font-size:13px;line-height:1.3">${top1?top1[0].substring(0,28):'—'}</div><div class="kpi-delta neutral">${top1?fmt(top1[1])+' dosis':''}</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-label">Registros</div><div class="kpi-value">${fmt(data.length)}</div><div class="kpi-delta neutral">en filtro actual</div></div>
+  `;
+  const mesDosis={};MES_ORDER.forEach(m=>mesDosis[m]=0);
+  data.forEach(r=>{if(mesDosis[r.mes]!==undefined)mesDosis[r.mes]+=r.dosis;});
+  destroyChart('meses');
+  const ctxM=getCtx('c-meses');
+  if(ctxM)charts['meses']=new Chart(ctxM,{type:'bar',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:[{label:'Dosis',data:MES_ORDER.map(m=>mesDosis[m]),backgroundColor:COLORS[0]+'cc',borderColor:COLORS[0],borderWidth:1,borderRadius:4}]},options:chartDef()});
+
+  const aDosis=años.map(a=>({a,d:sumDosis(registros.filter(r=>r.año==a))}));
+  destroyChart('anios');
+  const ctxA=getCtx('c-anios');
+  if(ctxA)charts['anios']=new Chart(ctxA,{type:'line',data:{labels:aDosis.map(x=>x.a),datasets:[{label:'Dosis',data:aDosis.map(x=>x.d),borderColor:COLORS[2],backgroundColor:COLORS[2]+'33',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:COLORS[2]}]},options:chartDef()});
+
+  const gm=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const t10=Object.entries(gm).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  destroyChart('dona');
+  const ctxD=getCtx('c-dona');
+  if(ctxD)charts['dona']=new Chart(ctxD,{type:'doughnut',data:{labels:t10.map(x=>x[0].substring(0,22)),datasets:[{data:t10.map(x=>x[1]),backgroundColor:COLORS.map(c=>c+'cc'),borderColor:COLORS,borderWidth:1}]},options:{...chartDef(),cutout:'55%',plugins:{legend:{position:'right',labels:{color:darkMode?'#e2e8f0':'#1e293b',font:{family:'Outfit',size:10},boxWidth:12}}}}});
+
+  const last4=años.slice(-4);
+  destroyChart('comp4');
+  const ctxC4=getCtx('c-comp4');
+  if(ctxC4)charts['comp4']=new Chart(ctxC4,{type:'line',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:last4.map((a,i)=>({label:String(a),data:MES_ORDER.map(m=>sumDosis(registros.filter(r=>r.año==a&&r.mes==m))),borderColor:COLORS[i],backgroundColor:COLORS[i]+'33',fill:false,tension:.3,pointRadius:3}))},options:chartDef()});
+}
+
+function renderPeriodo(){
+  const anio=getVal('p-anio'),mes=getVal('p-mes');
+  const data=filterReg(anio,mes);
+  const prev=filterReg(String(parseInt(anio)-1),mes);
+  const total=sumDosis(data),totalPrev=sumDosis(prev);
+  const gmap=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const top1=Object.entries(gmap).sort((a,b)=>b[1]-a[1])[0];
+  const nG=new Set(data.map(r=>r.grupo_objetivo)).size;
+  document.getElementById('kpi-periodo').innerHTML=`
+    <div class="kpi-card"><div class="kpi-icon">💉</div><div class="kpi-label">Dosis ${anio}</div><div class="kpi-value">${fmt(total)}</div>${deltaHtml(total,totalPrev)}</div>
+    <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-label">Año Anterior ${parseInt(anio)-1}</div><div class="kpi-value">${fmt(totalPrev)}</div><div class="kpi-delta neutral">referencia</div></div>
+    <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Grupos Activos</div><div class="kpi-value">${nG}</div><div class="kpi-delta neutral">en período</div></div>
+    <div class="kpi-card"><div class="kpi-icon">🎯</div><div class="kpi-label">Grupo Principal</div><div class="kpi-value" style="font-size:13px">${top1?top1[0].substring(0,25):'-'}</div><div class="kpi-delta neutral">${top1?fmt(top1[1])+' dosis':''}</div></div>
+  `;
+  const topG=Object.entries(gmap).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  destroyChart('pgrupo');
+  const ctxG=getCtx('c-pgrupo');
+  if(ctxG)charts['pgrupo']=new Chart(ctxG,{type:'bar',data:{labels:topG.map(x=>x[0].substring(0,20)),datasets:[{label:'Dosis',data:topG.map(x=>x[1]),backgroundColor:COLORS.map(c=>c+'cc'),borderColor:COLORS,borderWidth:1,borderRadius:3}]},options:{...chartDef(),indexAxis:'y',plugins:{legend:{display:false}}}});
+
+  destroyChart('pmensual');
+  const ctxM2=getCtx('c-pmensual');
+  if(ctxM2)charts['pmensual']=new Chart(ctxM2,{type:'bar',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:[{label:anio,data:MES_ORDER.map(m=>sumDosis(filterReg(anio,m))),backgroundColor:COLORS[0]+'cc',borderColor:COLORS[0],borderRadius:4},{label:String(parseInt(anio)-1),data:MES_ORDER.map(m=>sumDosis(filterReg(String(parseInt(anio)-1),m))),backgroundColor:COLORS[1]+'cc',borderColor:COLORS[1],borderRadius:4}]},options:chartDef()});
+
+  const rows=data.reduce((a,r)=>{const k=r.grupo_objetivo+'|'+r.mes;if(!a[k])a[k]={grupo:r.grupo_objetivo,mes:r.mes,dosis:0};a[k].dosis+=r.dosis;return a},{});
+  const sorted=Object.values(rows).sort((a,b)=>b.dosis-a.dosis);
+  document.getElementById('tb-periodo').innerHTML=sorted.map(x=>`<tr><td>${x.grupo}</td><td><span class="badge badge-blue">${x.mes}</span></td><td><strong>${fmt(x.dosis)}</strong></td><td>${total>0?(x.dosis/total*100).toFixed(1)+'%':'—'}</td></tr>`).join('');
+}
+
+function renderComparativa(){
+  const años=['cmp-y1','cmp-y2','cmp-y3','cmp-y4','cmp-y5'].map(id=>getVal(id)).filter(v=>v&&v!==''&&v!=='all').map(Number);
+  const uniq=[...new Set(años)].sort();
+  if(uniq.length<2){document.getElementById('kpi-cmp').innerHTML='<div style="color:var(--text-muted);padding:20px">Selecciona al menos 2 años</div>';return;}
+  const totales=uniq.map(a=>sumDosis(registros.filter(r=>r.año==a)));
+  const max=Math.max(...totales),min=Math.min(...totales);
+  const mejor=uniq[totales.indexOf(max)],peor=uniq[totales.indexOf(min)];
+  const prom=totales.reduce((a,b)=>a+b,0)/totales.length;
+  document.getElementById('kpi-cmp').innerHTML=uniq.map((a,i)=>`<div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-label">Año ${a}</div><div class="kpi-value">${fmt(totales[i])}</div>${i>0?deltaHtml(totales[i],totales[i-1]):'<div class="kpi-delta neutral">base</div>'}</div>`).join('')+
+  `<div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-label">Promedio</div><div class="kpi-value">${fmt(Math.round(prom))}</div><div class="kpi-delta neutral">dosis/año</div></div>
+   <div class="kpi-card"><div class="kpi-icon">🏆</div><div class="kpi-label">Mejor Año</div><div class="kpi-value">${mejor}</div><div class="kpi-delta up">máximo: ${fmt(max)}</div></div>
+   <div class="kpi-card"><div class="kpi-icon">📉</div><div class="kpi-label">Menor Año</div><div class="kpi-value">${peor}</div><div class="kpi-delta down">mínimo: ${fmt(min)}</div></div>`;
+
+  destroyChart('cmp-mes');
+  const ctxCM=getCtx('c-cmp-mes');
+  if(ctxCM)charts['cmp-mes']=new Chart(ctxCM,{type:'line',data:{labels:MES_ORDER.map(m=>m.substring(0,3)),datasets:uniq.map((a,i)=>({label:String(a),data:MES_ORDER.map(m=>sumDosis(registros.filter(r=>r.año==a&&r.mes==m))),borderColor:COLORS[i],backgroundColor:COLORS[i]+'44',fill:false,tension:.3,pointRadius:4}))},options:chartDef()});
+
+  document.getElementById('th-cmp').innerHTML='<tr><th>Mes</th>'+uniq.map(a=>`<th>${a}</th>`).join('')+'</tr>';
+  document.getElementById('tb-cmp').innerHTML=MES_ORDER.map(m=>{
+    const vals=uniq.map(a=>sumDosis(registros.filter(r=>r.año==a&&r.mes==m)));
+    const mxV=Math.max(...vals);
+    return `<tr><td><strong>${m}</strong></td>${vals.map((v,i)=>`<td style="${v===mxV&&mxV>0?'color:var(--green);font-weight:700':''}">${fmt(v)}</td>`).join('')}</tr>`;
+  }).join('')+`<tr style="background:var(--bg-card2)"><td><strong>TOTAL</strong></td>${uniq.map(a=>`<td><strong>${fmt(sumDosis(registros.filter(r=>r.año==a)))}</strong></td>`).join('')}</tr>`;
+}
+
+function renderTop5(){
+  const anio=getVal('t5-anio'),mes=getVal('t5-mes'),n=parseInt(getVal('t5-n'));
+  const data=filterReg(anio,mes);
+  const total=sumDosis(data);
+  const gmap=data.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  const sorted=Object.entries(gmap).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const maxD=sorted[0]?sorted[0][1]:1;
+  const rankColors=['#f59e0b','#94a3b8','#cd7f32','#10b981','#0ea5e9','#a855f7','#ec4899','#ef4444','#06b6d4','#84cc16','#14b8a6','#f43f5e','#fb923c','#6366f1','#22d3ee'];
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('ranking-list').innerHTML=sorted.map(([g,d],i)=>`<div class="rank-item">
+    <div class="rank-num" style="background:${rankColors[i]}22;color:${rankColors[i]}">${medals[i]||'#'+(i+1)}</div>
+    <div class="rank-bar-wrap"><div class="rank-name">${g}</div><div class="rank-bar"><div class="rank-bar-fill" style="width:${(d/maxD*100).toFixed(1)}%;background:${rankColors[i]}"></div></div></div>
+    <div class="rank-stats"><strong>${fmt(d)}</strong><br>${total>0?(d/total*100).toFixed(1)+'%':'—'}</div>
+  </div>`).join('');
+
+  destroyChart('top5');
+  const ctxT=getCtx('c-top5');
+  if(ctxT)charts['top5']=new Chart(ctxT,{type:'bar',data:{labels:sorted.map(([g])=>g.substring(0,20)),datasets:[{label:'Dosis',data:sorted.map(([,d])=>d),backgroundColor:rankColors.slice(0,n).map(c=>c+'cc'),borderColor:rankColors.slice(0,n),borderWidth:1,borderRadius:4}]},options:{...chartDef(),indexAxis:'y',plugins:{legend:{display:false}}}});
+
+  const dataPrev=filterReg(anio==='all'?'all':String(parseInt(anio)-1),mes);
+  const gmapPrev=dataPrev.reduce((a,r)=>{a[r.grupo_objetivo]=(a[r.grupo_objetivo]||0)+r.dosis;return a},{});
+  document.getElementById('tb-top5').innerHTML=sorted.map(([g,d],i)=>{
+    const prev=gmapPrev[g]||0;
+    const v=prev>0?((d-prev)/prev*100).toFixed(1):null;
+    return `<tr><td><strong>${i+1}</strong></td><td>${g}</td><td><strong>${fmt(d)}</strong></td><td>${total>0?(d/total*100).toFixed(1)+'%':'—'}</td><td>${v!==null?`<span style="color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'↑':'↓'}${Math.abs(v)}%</span>`:'—'}</td></tr>`;
+  }).join('');
+}
+
+function renderDatos(){datosFiltered=[...registros];currentPage=1;renderDatosTable();}
+function filterDatos(){
+  const q=document.getElementById('search-datos').value.toLowerCase();
+  datosFiltered=q?registros.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))):[...registros];
+  currentPage=1;renderDatosTable();
+}
+function sortTable(key){
+  if(datosSortKey===key)datosSortDir*=-1;else{datosSortKey=key;datosSortDir=1;}
+  datosFiltered.sort((a,b)=>{const av=a[key]??'',bv=b[key]??'';return typeof av==='number'?(av-bv)*datosSortDir:String(av).localeCompare(String(bv))*datosSortDir;});
+  renderDatosTable();
+}
+function renderDatosTable(){
+  const total=datosFiltered.length,totalPages=Math.ceil(total/PAGE_SIZE);
+  const start=(currentPage-1)*PAGE_SIZE;
+  const page=datosFiltered.slice(start,start+PAGE_SIZE);
+  document.getElementById('tb-datos').innerHTML=page.map(r=>`<tr>
+    <td>${r.año}</td><td><span class="badge badge-blue">${r.mes}</span></td>
+    <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.grupo_objetivo}</td>
+    <td><strong>${fmt(r.dosis)}</strong></td><td>${r.origen}</td><td>${r.semana||'—'}</td>
+    <td><span class="badge ${r.fuente==='HISTORICO'?'badge-green':'badge-amber'}">${r.fuente}</span></td>
+  </tr>`).join('')||'<tr><td colspan="7" class="no-data">Sin resultados</td></tr>';
+  document.getElementById('page-info').textContent=`Mostrando ${start+1}–${Math.min(start+PAGE_SIZE,total)} de ${fmt(total)}`;
+  const btns=document.getElementById('page-btns');btns.innerHTML='';
+  const addBtn=(l,p,c='')=>{const b=document.createElement('button');b.className='page-btn '+c;b.textContent=l;b.onclick=()=>{currentPage=p;renderDatosTable();};btns.appendChild(b);};
+  if(currentPage>1)addBtn('‹',currentPage-1);
+  for(let i=Math.max(1,currentPage-2);i<=Math.min(totalPages,currentPage+2);i++)addBtn(i,i,i===currentPage?'active':'');
+  if(currentPage<totalPages)addBtn('›',currentPage+1);
+}
+
+function exportExcel(){
+  const ws=XLSX.utils.json_to_sheet(registros);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Datos');
+  XLSX.writeFile(wb,`influenza_export_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+function openImportModal(){document.getElementById('import-modal').classList.add('open');}
+function verifyImport(){
+  if(document.getElementById('import-pass').value!=='Zoe2023@'){document.getElementById('import-err').textContent='❌ Contraseña incorrecta';return;}
+  document.getElementById('import-err').textContent='';
+  const fi=document.getElementById('import-file');fi.click();
+  fi.onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>{try{APP_DATA=JSON.parse(ev.target.result);processData();closeModal('import-modal');document.getElementById('import-pass').value='';}catch{document.getElementById('import-err').textContent='❌ JSON inválido';}};rd.readAsText(f);};
+}
+async function refreshData(){await loadData();}
+function openAbout(){
+  const m=APP_DATA?.meta||{};
+  document.getElementById('about-content').innerHTML=`<b>Sistema:</b> ${m.dashboard_nombre||'—'}<br><b>Área:</b> ${m.area||'—'}<br><b>Versión:</b> ${m.version||'1.0'}<br><b>Registros:</b> ${fmt(registros.length)}<br><b>Actualizado:</b> ${(m.ultima_actualizacion||'—').replace('T',' ')}<br><br><b>Autor:</b> Rodrigo Villalobos R.<br><b>Mail:</b> <a href="mailto:rodrigovillalobos1978@gmail.com" style="color:var(--accent)">rodrigovillalobos1978@gmail.com</a>`;
+  document.getElementById('about-modal').classList.add('open');
+}
+function toggleTheme(){darkMode=!darkMode;document.body.classList.toggle('light',!darkMode);document.getElementById('themeBtn').textContent=darkMode?'☀️ Modo Claro':'🌙 Modo Oscuro';renderResumen();renderPeriodo();if(document.getElementById('tab-comparativa').classList.contains('active'))renderComparativa();renderTop5();}
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.toggle('active',t.id==='tab-'+name));
+  if(name==='comparativa')renderComparativa();
+  if(name==='top5')renderTop5();
+  if(name==='datos')renderDatos();
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showSpinner(v){document.getElementById('spinner').classList.toggle('show',v);}
+</script>
+</body>
+</html>
